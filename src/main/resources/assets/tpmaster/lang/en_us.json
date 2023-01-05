@@ -1,0 +1,13 @@
+{
+  "language": "English",
+  "language.code": "en_us",
+  "language.region": "United States",
+
+  "commands.tpmaster.accept.success": "You accepted %s's teleport request.",
+  "commands.tpmaster.deny.success": "You denied %s's teleport request.",
+  "commands.tpmaster.request.accepted": "Your teleport request is accepted by %s.",
+  "commands.tpmaster.request.denied": "Your teleport request is denied by %s.",
+  "commands.tpmaster.away.success": "Successfully teleport you %d blocks away.",
+  "commands.tpmaster.away.invalid.distance": "Invalid parameter distance = %d, required 0 < distance < 10000.",
+  "commands.tpmaster.away.failed.no_position": "No legal position found. Try again later with different parameter value."
+}
