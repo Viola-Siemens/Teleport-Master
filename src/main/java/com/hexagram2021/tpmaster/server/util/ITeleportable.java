@@ -13,6 +13,7 @@ public interface ITeleportable {
 	void clearTeleportMasterRequest();
 	void setTeleportMasterRequest(@NotNull ITeleportable target, @NotNull RequestType type);
 	void receiveTeleportMasterRequestFrom(@NotNull Entity from, @NotNull RequestType type);
+	void setTeleportMasterAway();
 
 	boolean canUseTeleportMasterAway();
 	boolean canUseTeleportMasterRequest();

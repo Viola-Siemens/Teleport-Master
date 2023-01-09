@@ -1,6 +1,5 @@
 package com.hexagram2021.tpmaster.server.commands;
 
-import com.hexagram2021.tpmaster.TeleportMaster;
 import com.hexagram2021.tpmaster.server.config.TPMServerConfig;
 import com.hexagram2021.tpmaster.server.util.ITeleportable;
 import com.hexagram2021.tpmaster.server.util.LevelUtils;
@@ -30,7 +29,6 @@ import net.minecraft.world.level.biome.Biome;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
-import java.util.Objects;
 import java.util.Random;
 
 public class TPMCommands {
@@ -142,8 +140,11 @@ public class TPMCommands {
 
 	@SuppressWarnings("SameParameterValue")
 	private static int away(CommandSourceStack stack, Entity entity, int distance, boolean mustOnLand, @Nullable TeleportCommand.LookAt lookAt) throws CommandSyntaxException {
-		if(entity instanceof ITeleportable teleportable && !teleportable.canUseTeleportMasterAway()) {
-			throw COOL_DOWN_AWAY.create(teleportable.getTeleportMasterAwayCoolDownTick() / 20);
+		if(entity instanceof ITeleportable teleportable) {
+			if(!teleportable.canUseTeleportMasterAway()) {
+				throw COOL_DOWN_AWAY.create(teleportable.getTeleportMasterAwayCoolDownTick() / 20);
+			}
+			teleportable.setTeleportMasterAway();
 		}
 		if(distance == 0) {
 			distance = entity.level.getRandom().nextInt(600) + 600;
@@ -156,14 +157,12 @@ public class TPMCommands {
 		double x = entity.getX();
 		double y = entity.getY();
 		double z = entity.getZ();
-		//问题：未加载区块的y=-64
 		for(int i = 0; i < TPMServerConfig.AWAY_TRY_COUNT.get(); ++i) {
 			double phi = random.nextDouble(2.0D * Math.acos(-1.0D));
 			x = entity.getX() + distance * Math.cos(phi) + random.nextDouble(TPMServerConfig.AWAY_NOISE_BOUND.get() * distance);
 			z = entity.getZ() + distance * Math.sin(phi) + random.nextDouble(TPMServerConfig.AWAY_NOISE_BOUND.get() * distance);
 			BlockPos blockPos = new BlockPos(x, 256.0D, z);
 			Biome biome = entity.level.getBiome(blockPos).value();
-			TeleportMaster.LOGGER.debug(Objects.requireNonNull(biome.getRegistryName()).toString());
 			boolean conti = false;
 			if(mustOnLand) {
 				for (String ocean : TPMServerConfig.OCEAN_BIOME_KEYS.get()) {
@@ -186,7 +185,6 @@ public class TPMCommands {
 		if(!flag) {
 			throw CANNOT_FIND_POSITION.create();
 		}
-		TeleportMaster.LOGGER.debug("(%f, %f, %f)".formatted(x, y, z));
 		TeleportCommand.performTeleport(stack, entity, (ServerLevel)entity.level, x, y, z, EnumSet.noneOf(ClientboundPlayerPositionPacket.RelativeArgument.class), entity.getYRot(), entity.getXRot(), lookAt);
 
 		entity.sendMessage(new TextComponent(new TranslatableComponent("commands.tpmaster.away.success", distance).getString()), Util.NIL_UUID);

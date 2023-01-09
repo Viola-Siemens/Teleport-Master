@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static com.hexagram2021.tpmaster.server.config.TPMServerConfig.REQUEST_COMMAND_COOL_DOWN_TICK;
+import static com.hexagram2021.tpmaster.server.config.TPMServerConfig.*;
 
 @Mixin(ServerPlayer.class)
 public class ServerPlayerMixin implements ITeleportable {
@@ -43,13 +43,22 @@ public class ServerPlayerMixin implements ITeleportable {
 	@Override
 	public void setTeleportMasterRequest(@NotNull ITeleportable target, @NotNull RequestType type) {
 		target.receiveTeleportMasterRequestFrom((Entity)(Object)this, type);
-		this.teleportMasterRequestCoolDownTicks = REQUEST_COMMAND_COOL_DOWN_TICK.get();
+		if(!((ServerPlayer)(Object)this).getAbilities().instabuild) {
+			this.teleportMasterRequestCoolDownTicks = REQUEST_COMMAND_COOL_DOWN_TICK.get();
+		}
 	}
 
 	@Override
 	public void receiveTeleportMasterRequestFrom(@NotNull Entity from, @NotNull RequestType type) {
 		this.teleportMasterRequester = from;
 		this.requestType = type;
+	}
+
+	@Override
+	public void setTeleportMasterAway() {
+		if(!((ServerPlayer)(Object)this).getAbilities().instabuild) {
+			this.teleportMasterAwayCoolDownTicks = AWAY_COMMAND_COOL_DOWN_TICK.get();
+		}
 	}
 
 	@Override
