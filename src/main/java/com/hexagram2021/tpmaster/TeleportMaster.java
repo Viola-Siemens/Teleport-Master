@@ -1,5 +1,6 @@
 package com.hexagram2021.tpmaster;
 
+import com.hexagram2021.tpmaster.server.TPMContent;
 import com.hexagram2021.tpmaster.server.config.TPMServerConfig;
 import com.mojang.logging.LogUtils;
 import net.minecraftforge.common.MinecraftForge;
@@ -17,13 +18,13 @@ public class TeleportMaster {
 
     public TeleportMaster() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, TPMServerConfig.SPEC);
 
+        MinecraftForge.EVENT_BUS.addListener(TPMContent::registerCommands);
         MinecraftForge.EVENT_BUS.register(this);
     }
 
     private void setup(final FMLCommonSetupEvent event) {
-        // preinit
+        //preinit
     }
 }

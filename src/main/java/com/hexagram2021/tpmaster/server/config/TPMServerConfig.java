@@ -14,8 +14,11 @@ public class TPMServerConfig {
 	public static final ForgeConfigSpec.IntValue ACCEPT_DENY_PERMISSION_LEVEL;
 	public static final ForgeConfigSpec.IntValue AWAY_PERMISSION_LEVEL;
 	public static final ForgeConfigSpec.IntValue REQUEST_PERMISSION_LEVEL;
+	public static final ForgeConfigSpec.IntValue HELP_PERMISSION_LEVEL;
 
-	public static final ForgeConfigSpec.IntValue TELEPORT_COMMAND_COOL_DOWN_TICK;
+	public static final ForgeConfigSpec.IntValue AWAY_COMMAND_COOL_DOWN_TICK;
+	public static final ForgeConfigSpec.IntValue REQUEST_COMMAND_COOL_DOWN_TICK;
+	public static final ForgeConfigSpec.IntValue REQUEST_COMMAND_AUTO_DENY_TICK;
 
 	public static final ForgeConfigSpec.IntValue AWAY_TRY_COUNT;
 	public static final ForgeConfigSpec.DoubleValue AWAY_NOISE_BOUND;
@@ -31,9 +34,15 @@ public class TPMServerConfig {
 				.defineInRange("AWAY_PERMISSION_LEVEL", 0, 0, 4);
 		REQUEST_PERMISSION_LEVEL = BUILDER.comment("The permission level for request.")
 				.defineInRange("REQUEST_PERMISSION_LEVEL", 0, 0, 4);
+		HELP_PERMISSION_LEVEL = BUILDER.comment("The permission level for help.")
+				.defineInRange("HELP_PERMISSION_LEVEL", 0, 0, 4);
 
-		TELEPORT_COMMAND_COOL_DOWN_TICK = BUILDER.comment("The cool down time in ticks for player to use teleport commands.")
+		AWAY_COMMAND_COOL_DOWN_TICK = BUILDER.comment("The cool down time in ticks for player to use away commands.")
 				.defineInRange("TELEPORT_COMMAND_COOL_DOWN_TICK", 600, 0, 12000);
+		REQUEST_COMMAND_COOL_DOWN_TICK = BUILDER.comment("The cool down time in ticks for player to use request commands.")
+				.defineInRange("REQUEST_COMMAND_COOL_DOWN_TICK", 300, 0, 12000);
+		REQUEST_COMMAND_AUTO_DENY_TICK = BUILDER.comment("How many tick with no acceptance will players auto deny a teleport request after.")
+				.defineInRange("REQUEST_COMMAND_COOL_DOWN_TICK", 400, 0, 6000);
 
 		AWAY_TRY_COUNT = BUILDER.comment("How many times will it try when player use `/tpmaster away` command.")
 				.defineInRange("AWAY_TRY_COUNT", 128, 0, 256);

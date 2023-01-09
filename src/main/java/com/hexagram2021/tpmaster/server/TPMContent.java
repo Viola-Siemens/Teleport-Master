@@ -8,11 +8,8 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = TeleportMaster.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class TPMContent {
-
-	@SubscribeEvent
-	public void registerCommands(RegisterCommandsEvent event) {
+	public static void registerCommands(RegisterCommandsEvent event) {
 		final CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 		dispatcher.register(TPMCommands.register());
 	}
