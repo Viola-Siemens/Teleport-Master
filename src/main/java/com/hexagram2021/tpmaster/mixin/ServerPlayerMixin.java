@@ -1,6 +1,8 @@
 package com.hexagram2021.tpmaster.mixin;
 
 import com.hexagram2021.tpmaster.server.util.ITeleportable;
+import net.minecraft.Util;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
@@ -9,6 +11,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.UUID;
 
 import static com.hexagram2021.tpmaster.server.config.TPMServerConfig.*;
 
@@ -28,6 +32,33 @@ public class ServerPlayerMixin implements ITeleportable {
 		if(this.teleportMasterRequestCoolDownTicks > 0) {
 			--this.teleportMasterRequestCoolDownTicks;
 		}
+	}
+
+	@Inject(method = "readAdditionalSaveData", at = @At(value = "TAIL"))
+	public void readTeleportMasterData(CompoundTag nbt, CallbackInfo ci) {
+		UUID uuid = nbt.getUUID("TeleportMasterRequester");
+		if(uuid.equals(Util.NIL_UUID)) {
+			this.teleportMasterRequester = null;
+		} else {
+			this.teleportMasterRequester = ((ServerPlayer)(Object)this).level.getPlayerByUUID(uuid);
+		}
+		byte req = nbt.getByte("RequestType");
+		if(req <= 0 || req > RequestType.values().length) {
+			this.requestType = null;
+		} else {
+			this.requestType = RequestType.values()[req - 1];
+		}
+
+		this.teleportMasterAwayCoolDownTicks = nbt.getInt("TeleportMasterAwayCoolDownTicks");
+		this.teleportMasterRequestCoolDownTicks = nbt.getInt("TeleportMasterRequestCoolDownTicks");
+	}
+
+	@Inject(method = "addAdditionalSaveData", at = @At(value = "TAIL"))
+	public void addTeleportMasterData(CompoundTag nbt, CallbackInfo ci) {
+		nbt.putUUID("TeleportMasterRequester", this.teleportMasterRequester == null ? Util.NIL_UUID : this.teleportMasterRequester.getUUID());
+		nbt.putByte("RequestType", (byte)(this.requestType == null ? 0 : this.requestType.ordinal() + 1));
+		nbt.putInt("TeleportMasterAwayCoolDownTicks", this.teleportMasterAwayCoolDownTicks);
+		nbt.putInt("TeleportMasterRequestCoolDownTicks", this.teleportMasterRequestCoolDownTicks);
 	}
 
 	@Override @Nullable

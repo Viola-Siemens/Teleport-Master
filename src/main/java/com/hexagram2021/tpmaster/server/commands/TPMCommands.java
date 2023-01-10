@@ -214,7 +214,7 @@ public class TPMCommands {
 						case ASK -> "commands.tpmaster.request.receive.ask";
 						case INVITE -> "commands.tpmaster.request.receive.invite";
 					},
-					target.getName().getString()).getString()
+					entity.getName().getString()).getString()
 			), Util.NIL_UUID);
 		} else {
 			entity.sendMessage(new TextComponent(new TranslatableComponent("commands.tpmaster.request.success", target.getName().getString()).getString()), Util.NIL_UUID);
