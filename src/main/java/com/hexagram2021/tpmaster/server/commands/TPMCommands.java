@@ -124,7 +124,7 @@ public class TPMCommands {
 		return Command.SINGLE_SUCCESS;
 	}
 
-	private static int deny(Entity entity) throws CommandSyntaxException {
+	public static int deny(Entity entity) throws CommandSyntaxException {
 		if(entity instanceof ITeleportable teleportable) {
 			Entity requester = teleportable.getTeleportMasterRequester();
 			if(requester == null) {
@@ -214,8 +214,8 @@ public class TPMCommands {
 						case ASK -> "commands.tpmaster.request.receive.ask";
 						case INVITE -> "commands.tpmaster.request.receive.invite";
 					},
-					entity.getName().getString()).getString()
-			), Util.NIL_UUID);
+					entity.getName().getString(), TPMServerConfig.REQUEST_COMMAND_AUTO_DENY_TICK.get() / 20
+			).getString()), Util.NIL_UUID);
 		} else {
 			entity.sendMessage(new TextComponent(new TranslatableComponent("commands.tpmaster.request.success", target.getName().getString()).getString()), Util.NIL_UUID);
 			boolean flag1 = entity instanceof Monster || (entity instanceof NeutralMob && !(entity instanceof TamableAnimal));

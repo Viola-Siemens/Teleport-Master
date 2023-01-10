@@ -1,6 +1,9 @@
 package com.hexagram2021.tpmaster.mixin;
 
+import com.hexagram2021.tpmaster.server.commands.TPMCommands;
+import com.hexagram2021.tpmaster.server.config.TPMServerConfig;
 import com.hexagram2021.tpmaster.server.util.ITeleportable;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,7 +26,9 @@ public class ServerPlayerMixin implements ITeleportable {
 
 	private int teleportMasterAwayCoolDownTicks = 0;
 	private int teleportMasterRequestCoolDownTicks = 0;
+	private int teleportMasterAutoDenyTicks = 0;
 
+	@SuppressWarnings("ConstantConditions")
 	@Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayerGameMode;tick()V", shift = At.Shift.AFTER))
 	public void tickTeleportMaster(CallbackInfo ci) {
 		if(this.teleportMasterAwayCoolDownTicks > 0) {
@@ -31,6 +36,14 @@ public class ServerPlayerMixin implements ITeleportable {
 		}
 		if(this.teleportMasterRequestCoolDownTicks > 0) {
 			--this.teleportMasterRequestCoolDownTicks;
+		}
+		if(this.teleportMasterAutoDenyTicks > 0) {
+			--this.teleportMasterAutoDenyTicks;
+			if(this.teleportMasterAutoDenyTicks == 0) {
+				try {
+					TPMCommands.deny((ServerPlayer) (Object) this);
+				} catch(CommandSyntaxException ignored) {}
+			}
 		}
 	}
 
@@ -83,6 +96,8 @@ public class ServerPlayerMixin implements ITeleportable {
 	public void receiveTeleportMasterRequestFrom(@NotNull Entity from, @NotNull RequestType type) {
 		this.teleportMasterRequester = from;
 		this.requestType = type;
+
+		this.teleportMasterAutoDenyTicks = TPMServerConfig.REQUEST_COMMAND_AUTO_DENY_TICK.get();
 	}
 
 	@Override
