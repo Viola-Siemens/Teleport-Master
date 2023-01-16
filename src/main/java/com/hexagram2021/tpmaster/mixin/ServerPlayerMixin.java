@@ -64,6 +64,7 @@ public class ServerPlayerMixin implements ITeleportable {
 
 		this.teleportMasterAwayCoolDownTicks = nbt.getInt("TeleportMasterAwayCoolDownTicks");
 		this.teleportMasterRequestCoolDownTicks = nbt.getInt("TeleportMasterRequestCoolDownTicks");
+		this.teleportMasterAutoDenyTicks = nbt.getInt("TeleportMasterAutoDenyTicks");
 	}
 
 	@Inject(method = "addAdditionalSaveData", at = @At(value = "TAIL"))
@@ -72,6 +73,7 @@ public class ServerPlayerMixin implements ITeleportable {
 		nbt.putByte("RequestType", (byte)(this.requestType == null ? 0 : this.requestType.ordinal() + 1));
 		nbt.putInt("TeleportMasterAwayCoolDownTicks", this.teleportMasterAwayCoolDownTicks);
 		nbt.putInt("TeleportMasterRequestCoolDownTicks", this.teleportMasterRequestCoolDownTicks);
+		nbt.putInt("TeleportMasterAutoDenyTicks", this.teleportMasterAutoDenyTicks);
 	}
 
 	@Override @Nullable

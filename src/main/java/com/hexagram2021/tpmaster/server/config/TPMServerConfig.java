@@ -14,6 +14,7 @@ public class TPMServerConfig {
 	public static final ForgeConfigSpec.IntValue ACCEPT_DENY_PERMISSION_LEVEL;
 	public static final ForgeConfigSpec.IntValue AWAY_PERMISSION_LEVEL;
 	public static final ForgeConfigSpec.IntValue REQUEST_PERMISSION_LEVEL;
+	public static final ForgeConfigSpec.IntValue SPAWN_PERMISSION_LEVEL;
 	public static final ForgeConfigSpec.IntValue HELP_PERMISSION_LEVEL;
 
 	public static final ForgeConfigSpec.IntValue AWAY_COMMAND_COOL_DOWN_TICK;
@@ -34,6 +35,8 @@ public class TPMServerConfig {
 				.defineInRange("AWAY_PERMISSION_LEVEL", 0, 0, 4);
 		REQUEST_PERMISSION_LEVEL = BUILDER.comment("The permission level for request.")
 				.defineInRange("REQUEST_PERMISSION_LEVEL", 0, 0, 4);
+		SPAWN_PERMISSION_LEVEL = BUILDER.comment("The permission level for spawn.")
+				.defineInRange("SPAWN_PERMISSION_LEVEL", 0, 0, 4);
 		HELP_PERMISSION_LEVEL = BUILDER.comment("The permission level for help.")
 				.defineInRange("HELP_PERMISSION_LEVEL", 0, 0, 4);
 

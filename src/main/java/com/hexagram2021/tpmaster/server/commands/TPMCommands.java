@@ -65,6 +65,9 @@ public class TPMCommands {
 										)
 						)
 		).then(
+				Commands.literal("spawn").requires((stack) -> stack.hasPermission(TPMServerConfig.SPAWN_PERMISSION_LEVEL.get()))
+						.executes(context -> spawn(context.getSource(), context.getSource().getEntityOrException()))
+		).then(
 				Commands.literal("help").requires((stack) -> stack.hasPermission(TPMServerConfig.HELP_PERMISSION_LEVEL.get()))
 						.executes(context -> help(context.getSource().getEntityOrException()))
 		);
@@ -161,7 +164,7 @@ public class TPMCommands {
 			double phi = random.nextDouble(2.0D * Math.acos(-1.0D));
 			x = entity.getX() + distance * Math.cos(phi) + random.nextDouble(TPMServerConfig.AWAY_NOISE_BOUND.get() * distance);
 			z = entity.getZ() + distance * Math.sin(phi) + random.nextDouble(TPMServerConfig.AWAY_NOISE_BOUND.get() * distance);
-			BlockPos blockPos = new BlockPos(x, 256.0D, z);
+			BlockPos blockPos = new BlockPos(x, 255.0D, z);
 			Biome biome = entity.level.getBiome(blockPos).value();
 			boolean conti = false;
 			if(mustOnLand) {
@@ -240,6 +243,19 @@ public class TPMCommands {
 				entity.sendMessage(new TextComponent(new TranslatableComponent("commands.tpmaster.request.denied", target.getName().getString()).getString()), Util.NIL_UUID);
 			}
 		}
+
+		return Command.SINGLE_SUCCESS;
+	}
+
+	private static int spawn(CommandSourceStack stack, Entity entity) throws CommandSyntaxException {
+		ServerLevel overworld = stack.getServer().overworld();
+		BlockPos spawnPoint = overworld.getSharedSpawnPos();
+		TeleportCommand.performTeleport(
+				stack, entity, overworld,
+				spawnPoint.getX(), spawnPoint.getY() + 1.0D, spawnPoint.getZ(),
+				EnumSet.noneOf(ClientboundPlayerPositionPacket.RelativeArgument.class),
+				entity.getYRot(), entity.getXRot(), null
+		);
 
 		return Command.SINGLE_SUCCESS;
 	}

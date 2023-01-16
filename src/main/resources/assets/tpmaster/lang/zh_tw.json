@@ -2,6 +2,7 @@
   "language": "Chinese",
   "language.code": "zh_tw",
   "language.region": "Taiwan",
+  "tpmaster.thanks.for.the.contributor": "EvanHsieh0415",
   
   "commands.tpmaster.accept.success": "您同意了 %s 的傳送請求。",
   "commands.tpmaster.accept.failed.no_request": "您沒有收到任何傳送請求，無需同意。",
@@ -18,5 +19,5 @@
   "commands.tpmaster.away.invalid.distance": "無效的參數 distance = %d ，其範圍必須為 0 < distance < 10000。",
   "commands.tpmaster.away.failed.no_position": "找不到適合傳送的地方，請稍後再試（建議嘗試使用不同的參數）。",
   "commands.tpmaster.away.failed.cool_down": "您使用 `/tpmaster away` 指令過於頻繁，請等待 %d 秒。",
-  "commands.tpmaster.help": "Usage: `/tpmaster <operation> [<arg1> <arg2> ...]`.\n`/tpmaster accept` - accept the teleport request you just received.\n`/tpmaster deny` - deny the teleport request you just received.\n`/tpmaster away [<distance> [<mustOnLand>]]` - randomly teleport you <distance> blocks away (disable <mustOnLand> to accept positions in water).\n`/tpmaster request <target> [ ask | invite ]` - create a teleport request that you ask <target> if you can teleport where <target> is, or you invite <target> to come to where you are."
+  "commands.tpmaster.help": "使用方法：`/tpmaster <operation> [<arg1> <arg2> ...]`。\n`/tpmaster accept`——同意您剛剛收到的傳送請求。\n`/tpmaster deny`——拒絕您剛剛收到的傳送請求。\n`/tpmaster away [<distance> [<mustOnLand>]]`——隨機將您傳送到 <distance> 格以外（禁用 <mustOnLand> 可以允許您傳送到海面上）。\n`/tpmaster request <target> [ ask | invite ]`——創建一個傳送請求，向 <target> 詢問您能否傳送到 <target> 的位置，或邀請 <target> 傳送到您的位置。\n`/tpmaster spawn`——傳送到公共重生點。\n`/tpmaster help`——顯示幫助信息。"
 }
