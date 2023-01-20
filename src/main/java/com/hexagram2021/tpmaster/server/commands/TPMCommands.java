@@ -10,26 +10,25 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.commands.TeleportCommand;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
-import java.util.Random;
 
 public class TPMCommands {
 	public static LiteralArgumentBuilder<CommandSourceStack> register() {
@@ -74,27 +73,27 @@ public class TPMCommands {
 	}
 
 	private static final SimpleCommandExceptionType NO_NEED_TO_ACCEPT = new SimpleCommandExceptionType(
-			() -> new TranslatableComponent("commands.tpmaster.accept.failed.no_request").getString()
+			() -> Component.translatable("commands.tpmaster.accept.failed.no_request").getString()
 	);
 	private static final SimpleCommandExceptionType NO_NEED_TO_DENY = new SimpleCommandExceptionType(
-			() -> new TranslatableComponent("commands.tpmaster.deny.failed.no_request").getString()
+			() -> Component.translatable("commands.tpmaster.deny.failed.no_request").getString()
 	);
 	private static final DynamicCommandExceptionType TARGET_UNHANDLED_RESERVATION = new DynamicCommandExceptionType(
-			(name) -> () -> new TranslatableComponent("commands.tpmaster.request.failed.reserved", name).getString()
+			(name) -> () -> Component.translatable("commands.tpmaster.request.failed.reserved", name).getString()
 	);
 
 	private static final DynamicCommandExceptionType INVALID_AWAY_DISTANCE_PARAMETER = new DynamicCommandExceptionType(
-			(d) -> () -> new TranslatableComponent("commands.tpmaster.away.invalid.distance", d).getString()
+			(d) -> () -> Component.translatable("commands.tpmaster.away.invalid.distance", d).getString()
 	);
 	private static final SimpleCommandExceptionType CANNOT_FIND_POSITION = new SimpleCommandExceptionType(
-			() -> new TranslatableComponent("commands.tpmaster.away.failed.no_position").getString()
+			() -> Component.translatable("commands.tpmaster.away.failed.no_position").getString()
 	);
 
 	private static final DynamicCommandExceptionType COOL_DOWN_AWAY = new DynamicCommandExceptionType(
-			(d) -> () -> new TranslatableComponent("commands.tpmaster.away.failed.cool_down", d).getString()
+			(d) -> () -> Component.translatable("commands.tpmaster.away.failed.cool_down", d).getString()
 	);
 	private static final DynamicCommandExceptionType COOL_DOWN_REQUEST = new DynamicCommandExceptionType(
-			(d) -> () -> new TranslatableComponent("commands.tpmaster.request.failed.cool_down", d).getString()
+			(d) -> () -> Component.translatable("commands.tpmaster.request.failed.cool_down", d).getString()
 	);
 
 	private static int accept(CommandSourceStack stack, Entity entity) throws CommandSyntaxException {
@@ -120,8 +119,8 @@ public class TPMCommands {
 				);
 			}
 
-			entity.sendMessage(new TextComponent(new TranslatableComponent("commands.tpmaster.accept.success", requester.getName().getString()).getString()), Util.NIL_UUID);
-			requester.sendMessage(new TextComponent(new TranslatableComponent("commands.tpmaster.request.accepted", entity.getName().getString()).getString()), Util.NIL_UUID);
+			entity.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.accept.success", requester.getName().getString()).getString()));
+			requester.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.request.accepted", entity.getName().getString()).getString()));
 			teleportable.clearTeleportMasterRequest();
 		}
 		return Command.SINGLE_SUCCESS;
@@ -134,8 +133,8 @@ public class TPMCommands {
 				throw NO_NEED_TO_DENY.create();
 			}
 
-			entity.sendMessage(new TextComponent(new TranslatableComponent("commands.tpmaster.deny.success", requester.getName().getString()).getString()), Util.NIL_UUID);
-			requester.sendMessage(new TextComponent(new TranslatableComponent("commands.tpmaster.request.denied", entity.getName().getString()).getString()), Util.NIL_UUID);
+			entity.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.deny.success", requester.getName().getString()).getString()));
+			requester.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.request.denied", entity.getName().getString()).getString()));
 			teleportable.clearTeleportMasterRequest();
 		}
 		return Command.SINGLE_SUCCESS;
@@ -156,20 +155,20 @@ public class TPMCommands {
 		}
 
 		boolean flag = false;
-		Random random = entity.level.getRandom();
+		RandomSource random = entity.level.getRandom();
 		double x = entity.getX();
 		double y = entity.getY();
 		double z = entity.getZ();
 		for(int i = 0; i < TPMServerConfig.AWAY_TRY_COUNT.get(); ++i) {
-			double phi = random.nextDouble(2.0D * Math.acos(-1.0D));
-			x = entity.getX() + distance * Math.cos(phi) + random.nextDouble(TPMServerConfig.AWAY_NOISE_BOUND.get() * distance);
-			z = entity.getZ() + distance * Math.sin(phi) + random.nextDouble(TPMServerConfig.AWAY_NOISE_BOUND.get() * distance);
+			double phi = random.nextDouble() * 2.0D * Math.acos(-1.0D);
+			x = entity.getX() + distance * Math.cos(phi) + random.nextDouble() * TPMServerConfig.AWAY_NOISE_BOUND.get() * distance;
+			z = entity.getZ() + distance * Math.sin(phi) + random.nextDouble() * TPMServerConfig.AWAY_NOISE_BOUND.get() * distance;
 			BlockPos blockPos = new BlockPos(x, 255.0D, z);
 			Biome biome = entity.level.getBiome(blockPos).value();
 			boolean conti = false;
 			if(mustOnLand) {
 				for (String ocean : TPMServerConfig.OCEAN_BIOME_KEYS.get()) {
-					ResourceLocation biomeId = biome.getRegistryName();
+					ResourceLocation biomeId = ForgeRegistries.BIOMES.getKey(biome);
 					if (biomeId != null && biomeId.toString().equals(ocean)) {
 						conti = true;
 						break;
@@ -190,7 +189,7 @@ public class TPMCommands {
 		}
 		TeleportCommand.performTeleport(stack, entity, (ServerLevel)entity.level, x, y, z, EnumSet.noneOf(ClientboundPlayerPositionPacket.RelativeArgument.class), entity.getYRot(), entity.getXRot(), lookAt);
 
-		entity.sendMessage(new TextComponent(new TranslatableComponent("commands.tpmaster.away.success", distance).getString()), Util.NIL_UUID);
+		entity.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.away.success", distance).getString()));
 
 		return Command.SINGLE_SUCCESS;
 	}
@@ -211,16 +210,16 @@ public class TPMCommands {
 				teleportableTarget.receiveTeleportMasterRequestFrom(entity, type);
 			}
 
-			entity.sendMessage(new TextComponent(new TranslatableComponent("commands.tpmaster.request.success", target.getName().getString()).getString()), Util.NIL_UUID);
-			target.sendMessage(new TextComponent(new TranslatableComponent(
+			entity.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.request.success", target.getName().getString()).getString()));
+			target.sendSystemMessage(Component.literal(Component.translatable(
 					switch(type) {
 						case ASK -> "commands.tpmaster.request.receive.ask";
 						case INVITE -> "commands.tpmaster.request.receive.invite";
 					},
 					entity.getName().getString(), TPMServerConfig.REQUEST_COMMAND_AUTO_DENY_TICK.get() / 20
-			).getString()), Util.NIL_UUID);
+			).getString()));
 		} else {
-			entity.sendMessage(new TextComponent(new TranslatableComponent("commands.tpmaster.request.success", target.getName().getString()).getString()), Util.NIL_UUID);
+			entity.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.request.success", target.getName().getString()).getString()));
 			boolean flag1 = entity instanceof Monster || (entity instanceof NeutralMob && !(entity instanceof TamableAnimal));
 			boolean flag2 = target instanceof Monster || (target instanceof NeutralMob && !(target instanceof TamableAnimal));
 			if(flag1 == flag2) {
@@ -238,9 +237,9 @@ public class TPMCommands {
 							target.getYRot(), target.getXRot(), null
 					);
 				}
-				entity.sendMessage(new TextComponent(new TranslatableComponent("commands.tpmaster.request.accepted", target.getName().getString()).getString()), Util.NIL_UUID);
+				entity.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.request.accepted", target.getName().getString()).getString()));
 			} else {
-				entity.sendMessage(new TextComponent(new TranslatableComponent("commands.tpmaster.request.denied", target.getName().getString()).getString()), Util.NIL_UUID);
+				entity.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.request.denied", target.getName().getString()).getString()));
 			}
 		}
 
@@ -261,7 +260,7 @@ public class TPMCommands {
 	}
 
 	private static int help(Entity entity) {
-		entity.sendMessage(new TextComponent(new TranslatableComponent("commands.tpmaster.help").getString()), Util.NIL_UUID);
+		entity.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.help").getString()));
 
 		return Command.SINGLE_SUCCESS;
 	}
