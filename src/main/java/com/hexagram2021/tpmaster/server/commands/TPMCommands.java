@@ -119,8 +119,8 @@ public class TPMCommands {
 				);
 			}
 
-			entity.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.accept.success", requester.getName().getString()).getString()));
-			requester.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.request.accepted", entity.getName().getString()).getString()));
+			entity.sendSystemMessage(Component.translatable("commands.tpmaster.accept.success", requester.getName().getString()));
+			requester.sendSystemMessage(Component.translatable("commands.tpmaster.request.accepted", entity.getName().getString()));
 			teleportable.clearTeleportMasterRequest();
 		}
 		return Command.SINGLE_SUCCESS;
@@ -133,8 +133,8 @@ public class TPMCommands {
 				throw NO_NEED_TO_DENY.create();
 			}
 
-			entity.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.deny.success", requester.getName().getString()).getString()));
-			requester.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.request.denied", entity.getName().getString()).getString()));
+			entity.sendSystemMessage(Component.translatable("commands.tpmaster.deny.success", requester.getName().getString()));
+			requester.sendSystemMessage(Component.translatable("commands.tpmaster.request.denied", entity.getName().getString()));
 			teleportable.clearTeleportMasterRequest();
 		}
 		return Command.SINGLE_SUCCESS;
@@ -189,7 +189,7 @@ public class TPMCommands {
 		}
 		TeleportCommand.performTeleport(stack, entity, (ServerLevel)entity.level, x, y, z, EnumSet.noneOf(ClientboundPlayerPositionPacket.RelativeArgument.class), entity.getYRot(), entity.getXRot(), lookAt);
 
-		entity.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.away.success", distance).getString()));
+		entity.sendSystemMessage(Component.translatable("commands.tpmaster.away.success", distance));
 
 		return Command.SINGLE_SUCCESS;
 	}
@@ -210,16 +210,16 @@ public class TPMCommands {
 				teleportableTarget.receiveTeleportMasterRequestFrom(entity, type);
 			}
 
-			entity.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.request.success", target.getName().getString()).getString()));
-			target.sendSystemMessage(Component.literal(Component.translatable(
+			entity.sendSystemMessage(Component.translatable("commands.tpmaster.request.success", target.getName().getString()));
+			target.sendSystemMessage(Component.translatable(
 					switch(type) {
 						case ASK -> "commands.tpmaster.request.receive.ask";
 						case INVITE -> "commands.tpmaster.request.receive.invite";
 					},
 					entity.getName().getString(), TPMServerConfig.REQUEST_COMMAND_AUTO_DENY_TICK.get() / 20
-			).getString()));
+			));
 		} else {
-			entity.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.request.success", target.getName().getString()).getString()));
+			entity.sendSystemMessage(Component.translatable("commands.tpmaster.request.success", target.getName().getString()));
 			boolean flag1 = entity instanceof Monster || (entity instanceof NeutralMob && !(entity instanceof TamableAnimal));
 			boolean flag2 = target instanceof Monster || (target instanceof NeutralMob && !(target instanceof TamableAnimal));
 			if(flag1 == flag2) {
@@ -237,9 +237,9 @@ public class TPMCommands {
 							target.getYRot(), target.getXRot(), null
 					);
 				}
-				entity.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.request.accepted", target.getName().getString()).getString()));
+				entity.sendSystemMessage(Component.translatable("commands.tpmaster.request.accepted", target.getName().getString()));
 			} else {
-				entity.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.request.denied", target.getName().getString()).getString()));
+				entity.sendSystemMessage(Component.translatable("commands.tpmaster.request.denied", target.getName().getString()));
 			}
 		}
 
@@ -260,7 +260,7 @@ public class TPMCommands {
 	}
 
 	private static int help(Entity entity) {
-		entity.sendSystemMessage(Component.literal(Component.translatable("commands.tpmaster.help").getString()));
+		entity.sendSystemMessage(Component.translatable("commands.tpmaster.help"));
 
 		return Command.SINGLE_SUCCESS;
 	}
