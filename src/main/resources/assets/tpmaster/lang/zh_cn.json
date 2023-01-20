@@ -1,0 +1,22 @@
+{
+  "language": "Chinese",
+  "language.code": "zh_cn",
+  "language.region": "China",
+
+  "commands.tpmaster.accept.success": "您同意了%s的传送请求。",
+  "commands.tpmaster.accept.failed.no_request": "您没有收到任何传送请求，无需同意。",
+  "commands.tpmaster.deny.success": "您拒绝了%s的传送请求。",
+  "commands.tpmaster.deny.failed.no_request": "您没有收到任何传送请求，无需拒绝。",
+  "commands.tpmaster.request.success": "您成功向%s发送了传送请求。",
+  "commands.tpmaster.request.receive.ask": "【传送请求】%s希望传送到您的位置。使用`/tpmaster accept`同意这条请求，或使用`/tpmaster deny`（或等待%d秒）拒绝这条请求。",
+  "commands.tpmaster.request.receive.invite": "【传送请求】%s希望您传送到他/她的位置。使用`/tpmaster accept`同意这条请求，或使用`/tpmaster deny`（或等待%d秒）拒绝这条请求。",
+  "commands.tpmaster.request.accepted": "您的传送请求已被%s同意。你们将很快见面了。",
+  "commands.tpmaster.request.denied": "您的传送请求已被%s拒绝。",
+  "commands.tpmaster.request.failed.cool_down": "您使用指令`/tpmaster request`太过频繁！请等待%d秒。",
+  "commands.tpmaster.request.failed.reserved": "%s有一条未处理的传送请求，请等待一会。",
+  "commands.tpmaster.away.success": "成功将您传送到%d方块远的距离。",
+  "commands.tpmaster.away.invalid.distance": "非法的参数 distance = %d，其范围为 0 < distance < 10000。",
+  "commands.tpmaster.away.failed.no_position": "找不到合法的传送位置。请等待一会重试（建议尝试使用不同的参数）。",
+  "commands.tpmaster.away.failed.cool_down": "您使用指令`/tpmaster away`太过频繁！请等待%d秒。",
+  "commands.tpmaster.help": "使用方法：`/tpmaster <operation> [<arg1> <arg2> ...]`。\n`/tpmaster accept`——同意您刚刚收到的传送请求。\n`/tpmaster deny`——拒绝您刚刚收到的传送请求。\n`/tpmaster away [<distance> [<mustOnLand>]]`——随机将您传送到 <distance> 格以外（禁用 <mustOnLand> 可以允许您传送到海面上）。\n`/tpmaster request <target> [ ask | invite ]`——创建一个传送请求，向 <target> 询问您能否传送到 <target> 的位置，或邀请 <target> 传送到您的位置。\n`/tpmaster spawn`——传送到公共重生点。\n`/tpmaster help`——显示帮助信息。"
+}

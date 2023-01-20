@@ -1,0 +1,23 @@
+{
+  "language": "Chinese",
+  "language.code": "zh_tw",
+  "language.region": "Taiwan",
+  "tpmaster.thanks.for.the.contributor": "EvanHsieh0415",
+  
+  "commands.tpmaster.accept.success": "您同意了 %s 的傳送請求。",
+  "commands.tpmaster.accept.failed.no_request": "您沒有收到任何傳送請求，無需同意。",
+  "commands.tpmaster.deny.success": "您拒絕了 %s 的傳送請求。",
+  "commands.tpmaster.deny.failed.no_request": "您沒有收到任何傳送請求，無需拒絕。",
+  "commands.tpmaster.request.success": "你成功地向 %s 發送了傳送請求。",
+  "commands.tpmaster.request.receive.ask": "【傳送請求】 %s 希望傳送至你所在的位置。使用`/tpmaster accept`同意這項請求，或使用`/tpmaster deny`拒絕這項請求（或等待 %d 秒後自動拒絕）。",
+  "commands.tpmaster.request.receive.invite": "【傳送請求】 %s 希望您傳送到他/她的位置。使用`/tpmaster accept`同意這項請求，或使用`/tpmaster deny`拒絕這項請求（或等待 %d 秒後自動拒絕）。",
+  "commands.tpmaster.request.accepted": "您的傳送請求已被 %s 同意，您們很快就會相見了。",
+  "commands.tpmaster.request.denied": "您的傳送請求已被 %s 所拒絕。",
+  "commands.tpmaster.request.failed.cool_down": "您使用 `/tpmaster request` 指令過於頻繁，請等待 %d 秒。",
+  "commands.tpmaster.request.failed.reserved": "%s 有一條尚未處理的傳送請求，請稍等一會。",
+  "commands.tpmaster.away.success": "成功將您傳送至 %d 格遠的距離",
+  "commands.tpmaster.away.invalid.distance": "無效的參數 distance = %d ，其範圍必須為 0 < distance < 10000。",
+  "commands.tpmaster.away.failed.no_position": "找不到適合傳送的地方，請稍後再試（建議嘗試使用不同的參數）。",
+  "commands.tpmaster.away.failed.cool_down": "您使用 `/tpmaster away` 指令過於頻繁，請等待 %d 秒。",
+  "commands.tpmaster.help": "使用方法：`/tpmaster <operation> [<arg1> <arg2> ...]`。\n`/tpmaster accept`——同意您剛剛收到的傳送請求。\n`/tpmaster deny`——拒絕您剛剛收到的傳送請求。\n`/tpmaster away [<distance> [<mustOnLand>]]`——隨機將您傳送到 <distance> 格以外（禁用 <mustOnLand> 可以允許您傳送到海面上）。\n`/tpmaster request <target> [ ask | invite ]`——創建一個傳送請求，向 <target> 詢問您能否傳送到 <target> 的位置，或邀請 <target> 傳送到您的位置。\n`/tpmaster spawn`——傳送到公共重生點。\n`/tpmaster help`——顯示幫助信息。"
+}

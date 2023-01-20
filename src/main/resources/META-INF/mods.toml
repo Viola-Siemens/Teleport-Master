@@ -1,0 +1,30 @@
+modLoader="javafml"
+loaderVersion="[41,)"
+license="MIT"
+issueTrackerURL="https://github.com/Viola-Siemens/Teleport-Master/issues"
+
+[[mods]]
+modId="tpmaster"
+version="${file.jarVersion}"
+displayName="Teleport Master"
+logoFile="logo.png"
+credits="Liu Dongyu"
+authors="Hexagram"
+
+description='''
+This mod adds some commands for teleporting.
+'''
+
+[[dependencies.tpmaster]]
+    modId="forge"
+    mandatory=true
+    versionRange="[41,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.tpmaster]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.19,1.20)"
+    ordering="NONE"
+    side="BOTH"
