@@ -73,27 +73,27 @@ public class TPMCommands {
 	}
 
 	private static final SimpleCommandExceptionType NO_NEED_TO_ACCEPT = new SimpleCommandExceptionType(
-			() -> Component.translatable("commands.tpmaster.accept.failed.no_request").getString()
+			Component.translatable("commands.tpmaster.accept.failed.no_request")
 	);
 	private static final SimpleCommandExceptionType NO_NEED_TO_DENY = new SimpleCommandExceptionType(
-			() -> Component.translatable("commands.tpmaster.deny.failed.no_request").getString()
+			Component.translatable("commands.tpmaster.deny.failed.no_request")
 	);
 	private static final DynamicCommandExceptionType TARGET_UNHANDLED_RESERVATION = new DynamicCommandExceptionType(
-			(name) -> () -> Component.translatable("commands.tpmaster.request.failed.reserved", name).getString()
+			(name) -> Component.translatable("commands.tpmaster.request.failed.reserved", name)
 	);
 
 	private static final DynamicCommandExceptionType INVALID_AWAY_DISTANCE_PARAMETER = new DynamicCommandExceptionType(
-			(d) -> () -> Component.translatable("commands.tpmaster.away.invalid.distance", d).getString()
+			(d) -> Component.translatable("commands.tpmaster.away.invalid.distance", d)
 	);
 	private static final SimpleCommandExceptionType CANNOT_FIND_POSITION = new SimpleCommandExceptionType(
-			() -> Component.translatable("commands.tpmaster.away.failed.no_position").getString()
+			Component.translatable("commands.tpmaster.away.failed.no_position")
 	);
 
 	private static final DynamicCommandExceptionType COOL_DOWN_AWAY = new DynamicCommandExceptionType(
-			(d) -> () -> Component.translatable("commands.tpmaster.away.failed.cool_down", d).getString()
+			(d) -> Component.translatable("commands.tpmaster.away.failed.cool_down", d)
 	);
 	private static final DynamicCommandExceptionType COOL_DOWN_REQUEST = new DynamicCommandExceptionType(
-			(d) -> () -> Component.translatable("commands.tpmaster.request.failed.cool_down", d).getString()
+			(d) -> Component.translatable("commands.tpmaster.request.failed.cool_down", d)
 	);
 
 	private static int accept(CommandSourceStack stack, Entity entity) throws CommandSyntaxException {
