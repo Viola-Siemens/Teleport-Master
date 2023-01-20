@@ -6,6 +6,7 @@ import com.hexagram2021.tpmaster.server.util.ITeleportable;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
@@ -49,17 +50,21 @@ public class ServerPlayerMixin implements ITeleportable {
 
 	@Inject(method = "readAdditionalSaveData", at = @At(value = "TAIL"))
 	public void readTeleportMasterData(CompoundTag nbt, CallbackInfo ci) {
-		UUID uuid = nbt.getUUID("TeleportMasterRequester");
-		if(uuid.equals(Util.NIL_UUID)) {
-			this.teleportMasterRequester = null;
-		} else {
-			this.teleportMasterRequester = ((ServerPlayer)(Object)this).level.getPlayerByUUID(uuid);
+		if(nbt.contains("TeleportMasterRequester", Tag.TAG_INT_ARRAY)) {
+			UUID uuid = nbt.getUUID("TeleportMasterRequester");
+			if (uuid.equals(Util.NIL_UUID)) {
+				this.teleportMasterRequester = null;
+			} else {
+				this.teleportMasterRequester = ((ServerPlayer) (Object) this).level.getPlayerByUUID(uuid);
+			}
 		}
-		byte req = nbt.getByte("RequestType");
-		if(req <= 0 || req > RequestType.values().length) {
-			this.requestType = null;
-		} else {
-			this.requestType = RequestType.values()[req - 1];
+		if(nbt.contains("RequestType", Tag.TAG_BYTE)) {
+			byte req = nbt.getByte("RequestType");
+			if (req <= 0 || req > RequestType.values().length) {
+				this.requestType = null;
+			} else {
+				this.requestType = RequestType.values()[req - 1];
+			}
 		}
 
 		this.teleportMasterAwayCoolDownTicks = nbt.getInt("TeleportMasterAwayCoolDownTicks");
