@@ -8,12 +8,14 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -33,13 +35,13 @@ import java.util.EnumSet;
 public class TPMCommands {
 	public static LiteralArgumentBuilder<CommandSourceStack> register() {
 		return Commands.literal("tpmaster").then(
-				Commands.literal("accept").requires((stack) -> stack.hasPermission(TPMServerConfig.ACCEPT_DENY_PERMISSION_LEVEL.get()))
+				Commands.literal("accept").requires(stack -> stack.hasPermission(TPMServerConfig.ACCEPT_DENY_PERMISSION_LEVEL.get()))
 						.executes(context -> accept(context.getSource(), context.getSource().getEntityOrException()))
 		).then(
-				Commands.literal("deny").requires((stack) -> stack.hasPermission(TPMServerConfig.ACCEPT_DENY_PERMISSION_LEVEL.get()))
+				Commands.literal("deny").requires(stack -> stack.hasPermission(TPMServerConfig.ACCEPT_DENY_PERMISSION_LEVEL.get()))
 						.executes(context -> deny(context.getSource().getEntityOrException()))
 		).then(
-				Commands.literal("away").requires((stack) -> stack.hasPermission(TPMServerConfig.AWAY_PERMISSION_LEVEL.get()))
+				Commands.literal("away").requires(stack -> stack.hasPermission(TPMServerConfig.AWAY_PERMISSION_LEVEL.get()))
 						.executes(context -> away(context.getSource(), context.getSource().getEntityOrException(), 0, true, null))
 						.then(
 								Commands.argument("distance", IntegerArgumentType.integer(0, 10000))
@@ -50,7 +52,7 @@ public class TPMCommands {
 										)
 						)
 		).then(
-				Commands.literal("request").requires((stack) -> stack.hasPermission(TPMServerConfig.REQUEST_PERMISSION_LEVEL.get()))
+				Commands.literal("request").requires(stack -> stack.hasPermission(TPMServerConfig.REQUEST_PERMISSION_LEVEL.get()))
 						.then(
 								Commands.argument("target", EntityArgument.entity())
 										.executes(context -> request(context.getSource(), context.getSource().getEntityOrException(), EntityArgument.getEntity(context, "target"), ITeleportable.RequestType.ASK))
@@ -64,13 +66,27 @@ public class TPMCommands {
 										)
 						)
 		).then(
-				Commands.literal("spawn").requires((stack) -> stack.hasPermission(TPMServerConfig.SPAWN_PERMISSION_LEVEL.get()))
+				Commands.literal("spawn").requires(stack -> stack.hasPermission(TPMServerConfig.SPAWN_PERMISSION_LEVEL.get()))
 						.executes(context -> spawn(context.getSource(), context.getSource().getEntityOrException()))
 		).then(
-				Commands.literal("help").requires((stack) -> stack.hasPermission(TPMServerConfig.HELP_PERMISSION_LEVEL.get()))
+				Commands.literal("sethome").requires(stack -> stack.hasPermission(TPMServerConfig.HOME_PERMISSION_LEVEL.get()))
+						.executes(context -> sethome(context.getSource().getEntityOrException(), 0))
+						.then(
+								Commands.argument("index", IntegerArgumentType.integer(0, TPMServerConfig.MAX_HOME_COUNT.get() - 1))
+										.executes(context -> sethome(context.getSource().getEntityOrException(), IntegerArgumentType.getInteger(context, "index")))
+						)
+		).then(
+				Commands.literal("home").requires(stack -> stack.hasPermission(TPMServerConfig.HOME_PERMISSION_LEVEL.get()))
+						.executes(context -> home(context.getSource(), context.getSource().getEntityOrException(), 0))
+						.then(
+								Commands.argument("index", IntegerArgumentType.integer(0, TPMServerConfig.MAX_HOME_COUNT.get() - 1))
+										.executes(context -> home(context.getSource(), context.getSource().getEntityOrException(), IntegerArgumentType.getInteger(context, "index")))
+						)
+		).then(
+				Commands.literal("help").requires(stack -> stack.hasPermission(TPMServerConfig.HELP_PERMISSION_LEVEL.get()))
 						.executes(context -> help(context.getSource().getEntityOrException()))
 		);
-	}
+	}//TODO: remove home
 
 	private static final SimpleCommandExceptionType NO_NEED_TO_ACCEPT = new SimpleCommandExceptionType(
 			Component.translatable("commands.tpmaster.accept.failed.no_request")
@@ -87,6 +103,15 @@ public class TPMCommands {
 	);
 	private static final SimpleCommandExceptionType CANNOT_FIND_POSITION = new SimpleCommandExceptionType(
 			Component.translatable("commands.tpmaster.away.failed.no_position")
+	);
+	public static final Dynamic2CommandExceptionType INVALID_SETHOME_INDEX_PARAMETER = new Dynamic2CommandExceptionType(
+			(i, max) -> Component.translatable("commands.tpmaster.sethome.invalid.index", i, max)
+	);
+	private static final DynamicCommandExceptionType NO_HOME_TO_BACK = new DynamicCommandExceptionType(
+			(d) -> Component.translatable("commands.tpmaster.home.failed.no_home", d)
+	);
+	private static final DynamicCommandExceptionType NO_LEVEL_FOUNDED = new DynamicCommandExceptionType(
+			(level) -> Component.translatable("commands.tpmaster.home.failed.no_level", level)
 	);
 
 	private static final DynamicCommandExceptionType COOL_DOWN_AWAY = new DynamicCommandExceptionType(
@@ -255,6 +280,38 @@ public class TPMCommands {
 				EnumSet.noneOf(ClientboundPlayerPositionPacket.RelativeArgument.class),
 				entity.getYRot(), entity.getXRot(), null
 		);
+
+		return Command.SINGLE_SUCCESS;
+	}
+
+	private static int sethome(Entity entity, int index) throws  CommandSyntaxException {
+		if(entity instanceof ITeleportable teleportable) {
+			BlockPos pos = entity.getOnPos();
+			GlobalPos globalPos = GlobalPos.of(entity.level.dimension(), entity.getOnPos());
+			teleportable.setTeleportMasterHome(globalPos, index);
+			entity.sendSystemMessage(Component.translatable("commands.tpmaster.sethome.success", pos.getX(), pos.getY(), pos.getZ(), index));
+		}
+		return Command.SINGLE_SUCCESS;
+	}
+
+	private static int home(CommandSourceStack stack, Entity entity, int index) throws CommandSyntaxException {
+		if(entity instanceof ITeleportable teleportable) {
+			GlobalPos globalPos = teleportable.getTeleportMasterHome(index);
+			if(globalPos == null) {
+				throw NO_HOME_TO_BACK.create(index);
+			}
+			ServerLevel level = stack.getServer().getLevel(globalPos.dimension());
+			if(level == null) {
+				throw NO_LEVEL_FOUNDED.create(globalPos.dimension().toString());
+			}
+			BlockPos pos = globalPos.pos();
+			TeleportCommand.performTeleport(
+					stack, entity, level,
+					pos.getX(), pos.getY() + 1.0D, pos.getZ(),
+					EnumSet.noneOf(ClientboundPlayerPositionPacket.RelativeArgument.class),
+					entity.getYRot(), entity.getXRot(), null
+			);
+		}
 
 		return Command.SINGLE_SUCCESS;
 	}

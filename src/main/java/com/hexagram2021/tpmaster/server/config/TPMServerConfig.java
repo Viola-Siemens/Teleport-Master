@@ -15,6 +15,7 @@ public class TPMServerConfig {
 	public static final ForgeConfigSpec.IntValue AWAY_PERMISSION_LEVEL;
 	public static final ForgeConfigSpec.IntValue REQUEST_PERMISSION_LEVEL;
 	public static final ForgeConfigSpec.IntValue SPAWN_PERMISSION_LEVEL;
+	public static final ForgeConfigSpec.IntValue HOME_PERMISSION_LEVEL;
 	public static final ForgeConfigSpec.IntValue HELP_PERMISSION_LEVEL;
 
 	public static final ForgeConfigSpec.IntValue AWAY_COMMAND_COOL_DOWN_TICK;
@@ -23,6 +24,8 @@ public class TPMServerConfig {
 
 	public static final ForgeConfigSpec.IntValue AWAY_TRY_COUNT;
 	public static final ForgeConfigSpec.DoubleValue AWAY_NOISE_BOUND;
+
+	public static final ForgeConfigSpec.IntValue MAX_HOME_COUNT;
 
 	public static final ForgeConfigSpec.ConfigValue<List<String>> OCEAN_BIOME_KEYS;
 
@@ -37,6 +40,8 @@ public class TPMServerConfig {
 				.defineInRange("REQUEST_PERMISSION_LEVEL", 0, 0, 4);
 		SPAWN_PERMISSION_LEVEL = BUILDER.comment("The permission level for spawn.")
 				.defineInRange("SPAWN_PERMISSION_LEVEL", 0, 0, 4);
+		HOME_PERMISSION_LEVEL = BUILDER.comment("The permission level for sethome and home.")
+				.defineInRange("HOME_PERMISSION_LEVEL", 0, 0, 4);
 		HELP_PERMISSION_LEVEL = BUILDER.comment("The permission level for help.")
 				.defineInRange("HELP_PERMISSION_LEVEL", 0, 0, 4);
 
@@ -51,6 +56,9 @@ public class TPMServerConfig {
 				.defineInRange("AWAY_TRY_COUNT", 128, 0, 256);
 		AWAY_NOISE_BOUND = BUILDER.comment("The bound of noise when player use `/tpmaster away` command.")
 				.defineInRange("AWAY_NOISE_BOUND", 0.1, 0.01, 1.0);
+
+		MAX_HOME_COUNT = BUILDER.comment("How many homes at most will a player set.")
+				.defineInRange("MAX_HOME_COUNT", 8, 1, 64);
 
 		OCEAN_BIOME_KEYS = BUILDER.comment("The Resource Locations of ocean biomes (to ignore in random tp).")
 				.define("OCEAN_BIOME_KEYS", new ArrayList<>(

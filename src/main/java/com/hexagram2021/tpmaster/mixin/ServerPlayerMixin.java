@@ -5,13 +5,18 @@ import com.hexagram2021.tpmaster.server.config.TPMServerConfig;
 import com.hexagram2021.tpmaster.server.util.ITeleportable;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -22,12 +27,16 @@ import static com.hexagram2021.tpmaster.server.config.TPMServerConfig.*;
 
 @Mixin(ServerPlayer.class)
 public class ServerPlayerMixin implements ITeleportable {
+	@Shadow @Final
+	public MinecraftServer server;
 	private Entity teleportMasterRequester = null;
 	private RequestType requestType = null;
 
 	private int teleportMasterAwayCoolDownTicks = 0;
 	private int teleportMasterRequestCoolDownTicks = 0;
 	private int teleportMasterAutoDenyTicks = 0;
+
+	private final GlobalPos[] homes = new GlobalPos[MAX_HOME_COUNT.get()];
 
 	@SuppressWarnings("ConstantConditions")
 	@Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayerGameMode;tick()V", shift = At.Shift.AFTER))
@@ -70,6 +79,27 @@ public class ServerPlayerMixin implements ITeleportable {
 		this.teleportMasterAwayCoolDownTicks = nbt.getInt("TeleportMasterAwayCoolDownTicks");
 		this.teleportMasterRequestCoolDownTicks = nbt.getInt("TeleportMasterRequestCoolDownTicks");
 		this.teleportMasterAutoDenyTicks = nbt.getInt("TeleportMasterAutoDenyTicks");
+
+		if(nbt.contains("TeleportMasterHomes", Tag.TAG_COMPOUND)) {
+			CompoundTag homesTag = nbt.getCompound("TeleportMasterHomes");
+			for(int i = 0; i < MAX_HOME_COUNT.get(); ++i) {
+				if(homesTag.contains(String.valueOf(i), Tag.TAG_COMPOUND)) {
+					CompoundTag curHome = homesTag.getCompound(String.valueOf(i));
+
+					int finalI = i;
+					this.server.levelKeys().stream().filter(key -> key.location().toString().equals(curHome.getString("dimension"))).findFirst().ifPresentOrElse(
+							key -> this.homes[finalI] = GlobalPos.of(key, BlockPos.of(curHome.getLong("pos"))),
+							() -> this.homes[finalI] = null
+					);
+				} else {
+					this.homes[i] = null;
+				}
+			}
+		} else {
+			for(int i = 0; i < MAX_HOME_COUNT.get(); ++i) {
+				this.homes[i] = null;
+			}
+		}
 	}
 
 	@Inject(method = "addAdditionalSaveData", at = @At(value = "TAIL"))
@@ -79,6 +109,17 @@ public class ServerPlayerMixin implements ITeleportable {
 		nbt.putInt("TeleportMasterAwayCoolDownTicks", this.teleportMasterAwayCoolDownTicks);
 		nbt.putInt("TeleportMasterRequestCoolDownTicks", this.teleportMasterRequestCoolDownTicks);
 		nbt.putInt("TeleportMasterAutoDenyTicks", this.teleportMasterAutoDenyTicks);
+
+		CompoundTag homesTag = new CompoundTag();
+		for(int i = 0; i < MAX_HOME_COUNT.get(); ++i) {
+			if(this.homes[i] != null) {
+				CompoundTag curHome = new CompoundTag();
+				curHome.putString("dimension", this.homes[i].dimension().location().toString());
+				curHome.putLong("pos", this.homes[i].pos().asLong());
+				homesTag.put(String.valueOf(i), curHome);
+			}
+		}
+		nbt.put("TeleportMasterHomes", homesTag);
 	}
 
 	@Override @Nullable
@@ -138,5 +179,18 @@ public class ServerPlayerMixin implements ITeleportable {
 	@Override
 	public int getTeleportMasterRequestCoolDownTick() {
 		return this.teleportMasterRequestCoolDownTicks;
+	}
+
+	@Override
+	public void setTeleportMasterHome(GlobalPos pos, int index) throws CommandSyntaxException {
+		if(index < 0 || index >= MAX_HOME_COUNT.get()) {
+			throw TPMCommands.INVALID_SETHOME_INDEX_PARAMETER.create(index, MAX_HOME_COUNT.get());
+		}
+		this.homes[index] = pos;
+	}
+
+	@Override @Nullable
+	public GlobalPos getTeleportMasterHome(int index) {
+		return this.homes[index];
 	}
 }

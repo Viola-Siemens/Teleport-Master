@@ -1,5 +1,7 @@
 package com.hexagram2021.tpmaster.server.util;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,6 +21,10 @@ public interface ITeleportable {
 	boolean canUseTeleportMasterRequest();
 	int getTeleportMasterAwayCoolDownTick();
 	int getTeleportMasterRequestCoolDownTick();
+
+	void setTeleportMasterHome(GlobalPos pos, int index) throws CommandSyntaxException;
+	@Nullable
+	GlobalPos getTeleportMasterHome(int index);
 
 	enum RequestType {
 		ASK,		//Ask if requester can teleport to where requestee is.

@@ -18,5 +18,9 @@
   "commands.tpmaster.away.invalid.distance": "Invalid parameter distance = %d, required 0 < distance < 10000.",
   "commands.tpmaster.away.failed.no_position": "No legal position found. Try again later with different parameter value.",
   "commands.tpmaster.away.failed.cool_down": "You use `/tpmaster away` command too frequently! Please wait %d second(s).",
+  "commands.tpmaster.sethome.success": "Successfully set block position (%d, %d, %d) as your home %d.",
+  "commands.tpmaster.sethome.invalid.index": "Invalid parameter index = %d, required 0 <= index < %d.",
+  "commands.tpmaster.home.failed.no_home": "Failed to go home, you haven't set home %d yet.",
+  "commands.tpmaster.home.failed.no_level": "Failed to go home, no dimension matches \"%s\".",
   "commands.tpmaster.help": "Usage: `/tpmaster <operation> [<arg1> <arg2> ...]`.\n`/tpmaster accept` - accept the teleport request you just received.\n`/tpmaster deny` - deny the teleport request you just received.\n`/tpmaster away [<distance> [<mustOnLand>]]` - randomly teleport you <distance> blocks away (disable <mustOnLand> to accept positions in water).\n`/tpmaster request <target> [ ask | invite ]` - create a teleport request that you ask <target> if you can teleport where <target> is, or you invite <target> to come to where you are.\n`/tpmaster spawn` - teleport to shared spawn point.\n`/tpmaster help` - show help information."
 }

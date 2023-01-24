@@ -18,5 +18,9 @@
   "commands.tpmaster.away.invalid.distance": "非法的参数 distance = %d，其范围为 0 < distance < 10000。",
   "commands.tpmaster.away.failed.no_position": "找不到合法的传送位置。请等待一会重试（建议尝试使用不同的参数）。",
   "commands.tpmaster.away.failed.cool_down": "您使用指令`/tpmaster away`太过频繁！请等待%d秒。",
+  "commands.tpmaster.sethome.success": "成功将位置坐标(%d, %d, %d)设置为你的第%d个家.",
+  "commands.tpmaster.sethome.invalid.index": "非法的参数 index = %d，其范围为 0 <= index < %d。",
+  "commands.tpmaster.home.failed.no_home": "无法回家，你还没有设置你的第%d个家。",
+  "commands.tpmaster.home.failed.no_level": "无法回家，失配的维度“%s”。",
   "commands.tpmaster.help": "使用方法：`/tpmaster <operation> [<arg1> <arg2> ...]`。\n`/tpmaster accept`——同意您刚刚收到的传送请求。\n`/tpmaster deny`——拒绝您刚刚收到的传送请求。\n`/tpmaster away [<distance> [<mustOnLand>]]`——随机将您传送到 <distance> 格以外（禁用 <mustOnLand> 可以允许您传送到海面上）。\n`/tpmaster request <target> [ ask | invite ]`——创建一个传送请求，向 <target> 询问您能否传送到 <target> 的位置，或邀请 <target> 传送到您的位置。\n`/tpmaster spawn`——传送到公共重生点。\n`/tpmaster help`——显示帮助信息。"
 }
