@@ -16,6 +16,8 @@ public class TPMServerConfig {
 	public static final ForgeConfigSpec.IntValue REQUEST_PERMISSION_LEVEL;
 	public static final ForgeConfigSpec.IntValue SPAWN_PERMISSION_LEVEL;
 	public static final ForgeConfigSpec.IntValue HOME_PERMISSION_LEVEL;
+	public static final ForgeConfigSpec.IntValue BACK_PERMISSION_LEVEL;
+	public static final ForgeConfigSpec.IntValue REMOVE_PERMISSION_LEVEL;
 	public static final ForgeConfigSpec.IntValue HELP_PERMISSION_LEVEL;
 
 	public static final ForgeConfigSpec.IntValue AWAY_COMMAND_COOL_DOWN_TICK;
@@ -42,6 +44,10 @@ public class TPMServerConfig {
 				.defineInRange("SPAWN_PERMISSION_LEVEL", 0, 0, 4);
 		HOME_PERMISSION_LEVEL = BUILDER.comment("The permission level for sethome and home.")
 				.defineInRange("HOME_PERMISSION_LEVEL", 0, 0, 4);
+		BACK_PERMISSION_LEVEL = BUILDER.comment("The permission level for back.")
+				.defineInRange("BACK_PERMISSION_LEVEL", 0, 0, 4);
+		REMOVE_PERMISSION_LEVEL = BUILDER.comment("The permission level for remove home/back.")
+				.defineInRange("REMOVE_PERMISSION_LEVEL", 0, 0, 4);
 		HELP_PERMISSION_LEVEL = BUILDER.comment("The permission level for help.")
 				.defineInRange("HELP_PERMISSION_LEVEL", 0, 0, 4);
 

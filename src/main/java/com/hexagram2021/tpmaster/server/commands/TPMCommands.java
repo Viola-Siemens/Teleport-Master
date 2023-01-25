@@ -83,6 +83,17 @@ public class TPMCommands {
 										.executes(context -> home(context.getSource(), context.getSource().getEntityOrException(), IntegerArgumentType.getInteger(context, "index")))
 						)
 		).then(
+				Commands.literal("remove").requires(stack -> stack.hasPermission(TPMServerConfig.BACK_PERMISSION_LEVEL.get()))
+						.then(
+								Commands.literal("home").then(
+										Commands.argument("index", IntegerArgumentType.integer(0, TPMServerConfig.MAX_HOME_COUNT.get() - 1))
+												.executes(context -> removeHome(context.getSource().getEntityOrException(), IntegerArgumentType.getInteger(context, "index")))
+								)
+						)
+						.then(
+								Commands.literal("back").executes(context -> removeBack(context.getSource().getEntityOrException()))
+						)
+		).then(
 				Commands.literal("help").requires(stack -> stack.hasPermission(TPMServerConfig.HELP_PERMISSION_LEVEL.get()))
 						.executes(context -> help(context.getSource().getEntityOrException()))
 		);
@@ -313,6 +324,29 @@ public class TPMCommands {
 			);
 		}
 
+		return Command.SINGLE_SUCCESS;
+	}
+
+	private static int back(CommandSourceStack stack, Entity entity) {
+		if(entity instanceof ITeleportable teleportable) {
+			//TODO
+		}
+		return Command.SINGLE_SUCCESS;
+	}
+
+	private static int removeHome(Entity entity, int index) throws CommandSyntaxException {
+		if(entity instanceof ITeleportable teleportable) {
+			teleportable.setTeleportMasterHome(null, index);
+			entity.sendSystemMessage(Component.translatable("commands.tpmaster.remove.home.success", index));
+		}
+		return Command.SINGLE_SUCCESS;
+	}
+
+	private static int removeBack(Entity entity) {
+		if(entity instanceof ITeleportable teleportable) {
+			//TODO
+			entity.sendSystemMessage(Component.translatable("commands.tpmaster.remove.back.success"));
+		}
 		return Command.SINGLE_SUCCESS;
 	}
 
