@@ -3,6 +3,8 @@
   "language.code": "zh_tw",
   "language.region": "Taiwan",
   "tpmaster.thanks.for.the.contributor": "EvanHsieh0415",
+
+  "info.tpmaster.death": "您在%s的(%d, %d, %d)位置坐標死亡。",
   
   "commands.tpmaster.accept.success": "您同意了 %s 的傳送請求。",
   "commands.tpmaster.accept.failed.no_request": "您沒有收到任何傳送請求，無需同意。",
@@ -21,7 +23,11 @@
   "commands.tpmaster.away.failed.cool_down": "您使用 `/tpmaster away` 指令過於頻繁，請等待 %d 秒。",
   "commands.tpmaster.sethome.success": "成功將位置坐標(%d, %d, %d)設置爲你的第%d個家.",
   "commands.tpmaster.sethome.invalid.index": "無效的參數 index = %d，其範圍必須為 0 <= index < %d。",
-  "commands.tpmaster.home.failed.no_home": "無法回家，你還沒有設置你的第%d個家。",
+  "commands.tpmaster.home.failed.no_home": "無法回家，您還沒有設置您的第%d個家。",
   "commands.tpmaster.home.failed.no_level": "無法回家，無效的維度“%s”。",
-  "commands.tpmaster.help": "使用方法：`/tpmaster <operation> [<arg1> <arg2> ...]`。\n`/tpmaster accept`——同意您剛剛收到的傳送請求。\n`/tpmaster deny`——拒絕您剛剛收到的傳送請求。\n`/tpmaster away [<distance> [<mustOnLand>]]`——隨機將您傳送到 <distance> 格以外（禁用 <mustOnLand> 可以允許您傳送到海面上）。\n`/tpmaster request <target> [ ask | invite ]`——創建一個傳送請求，向 <target> 詢問您能否傳送到 <target> 的位置，或邀請 <target> 傳送到您的位置。\n`/tpmaster spawn`——傳送到公共重生點。\n`/tpmaster help`——顯示幫助信息。"
+  "commands.tpmaster.back.failed.no_home": "無法回到死亡點，您沒有死亡點。",
+  "commands.tpmaster.back.failed.no_level": "無法回到死亡點，無效的維度“%s”。",
+  "commands.tpmaster.remove.home.success": "成功刪除您的第%d個家。",
+  "commands.tpmaster.remove.back.success": "成功刪除您的上一個死亡點。",
+  "commands.tpmaster.help": "使用方法：`/tpmaster <operation> [<arg1> <arg2> ...]`。\n`/tpmaster accept`——同意您剛剛收到的傳送請求。\n`/tpmaster deny`——拒絕您剛剛收到的傳送請求。\n`/tpmaster away [<distance> [<mustOnLand>]]`——隨機將您傳送到 <distance> 格以外（禁用 <mustOnLand> 可以允許您傳送到海面上）。\n`/tpmaster request <target> [ ask | invite ]`——創建一個傳送請求，向 <target> 詢問您能否傳送到 <target> 的位置，或邀請 <target> 傳送到您的位置。\n`/tpmaster spawn`——傳送到公共重生點。\n`/tpmaster sethome [<index>]`——將您當前的位置設置爲您的第 <index> 個家。\n`/tpmaster home [<index>]`——傳送到您的第 <index> 個家。\n`/tpmaster back`——傳送到您的上一個死亡點。\n`/tpmaster remove home [<index>]`——刪除您的第 <index> 個家。\n`/tpmaster remove back`——刪除您的上一個死亡點。\n`/tpmaster help`——顯示幫助信息。"
 }

@@ -1,5 +1,6 @@
 package com.hexagram2021.tpmaster.mixin;
 
+import com.hexagram2021.tpmaster.TeleportMaster;
 import com.hexagram2021.tpmaster.server.commands.TPMCommands;
 import com.hexagram2021.tpmaster.server.config.TPMServerConfig;
 import com.hexagram2021.tpmaster.server.util.ITeleportable;
@@ -9,8 +10,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +32,7 @@ import static com.hexagram2021.tpmaster.server.config.TPMServerConfig.*;
 public class ServerPlayerMixin implements ITeleportable {
 	@Shadow @Final
 	public MinecraftServer server;
+	
 	private Entity teleportMasterRequester = null;
 	private RequestType requestType = null;
 
@@ -36,7 +40,9 @@ public class ServerPlayerMixin implements ITeleportable {
 	private int teleportMasterRequestCoolDownTicks = 0;
 	private int teleportMasterAutoDenyTicks = 0;
 
-	private final GlobalPos[] homes = new GlobalPos[MAX_HOME_COUNT.get()];
+	private final GlobalPos[] teleportMasterHomes = new GlobalPos[MAX_HOME_COUNT.get()];
+
+	private GlobalPos lastDeathPoint = null;
 
 	@SuppressWarnings("ConstantConditions")
 	@Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayerGameMode;tick()V", shift = At.Shift.AFTER))
@@ -87,17 +93,21 @@ public class ServerPlayerMixin implements ITeleportable {
 					CompoundTag curHome = homesTag.getCompound(String.valueOf(i));
 
 					int finalI = i;
-					this.server.levelKeys().stream().filter(key -> key.location().toString().equals(curHome.getString("dimension"))).findFirst().ifPresentOrElse(
-							key -> this.homes[finalI] = GlobalPos.of(key, BlockPos.of(curHome.getLong("pos"))),
-							() -> this.homes[finalI] = null
+					String dimension = curHome.getString("dimension");
+					this.server.levelKeys().stream().filter(key -> key.location().toString().equals(dimension)).findFirst().ifPresentOrElse(
+							key -> this.teleportMasterHomes[finalI] = GlobalPos.of(key, BlockPos.of(curHome.getLong("pos"))),
+							() -> {
+								TeleportMaster.LOGGER.error("No dimension named \"%s\".".formatted(dimension));
+								this.teleportMasterHomes[finalI] = null;
+							}
 					);
 				} else {
-					this.homes[i] = null;
+					this.teleportMasterHomes[i] = null;
 				}
 			}
 		} else {
 			for(int i = 0; i < MAX_HOME_COUNT.get(); ++i) {
-				this.homes[i] = null;
+				this.teleportMasterHomes[i] = null;
 			}
 		}
 	}
@@ -112,14 +122,37 @@ public class ServerPlayerMixin implements ITeleportable {
 
 		CompoundTag homesTag = new CompoundTag();
 		for(int i = 0; i < MAX_HOME_COUNT.get(); ++i) {
-			if(this.homes[i] != null) {
+			if(this.teleportMasterHomes[i] != null) {
 				CompoundTag curHome = new CompoundTag();
-				curHome.putString("dimension", this.homes[i].dimension().location().toString());
-				curHome.putLong("pos", this.homes[i].pos().asLong());
+				curHome.putString("dimension", this.teleportMasterHomes[i].dimension().location().toString());
+				curHome.putLong("pos", this.teleportMasterHomes[i].pos().asLong());
 				homesTag.put(String.valueOf(i), curHome);
 			}
 		}
 		nbt.put("TeleportMasterHomes", homesTag);
+	}
+	
+	@Inject(method = "die", at = @At(value = "TAIL"))
+	public void recordDeathPoint(DamageSource damageSource, CallbackInfo ci) {
+		ServerPlayer current = (ServerPlayer)(Object)this;
+		BlockPos pos = current.blockPosition();
+		this.setTeleportMasterLastDeathPoint(GlobalPos.of(current.level.dimension(), pos));
+		current.sendSystemMessage(Component.translatable("info.tpmaster.death", current.level.dimension().location(), pos.getX(), pos.getY(), pos.getZ()));
+	}
+
+	@Inject(method = "restoreFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setLastDeathLocation(Ljava/util/Optional;)V", shift = At.Shift.AFTER))
+	public void restoreTeleportMasterData(ServerPlayer source, boolean won, CallbackInfo ci) {
+		if(source instanceof ITeleportable teleportable) {
+			this.teleportMasterRequester = teleportable.getTeleportMasterRequester();
+			this.requestType = teleportable.getRequestType();
+			this.teleportMasterAwayCoolDownTicks = teleportable.getTeleportMasterAwayCoolDownTick();
+			this.teleportMasterRequestCoolDownTicks = teleportable.getTeleportMasterRequestCoolDownTick();
+			this.teleportMasterAutoDenyTicks = TPMServerConfig.REQUEST_COMMAND_AUTO_DENY_TICK.get();
+			for(int i = 0; i < MAX_HOME_COUNT.get(); ++i) {
+				this.teleportMasterHomes[i] = teleportable.getTeleportMasterHome(i);
+			}
+			this.lastDeathPoint = teleportable.getTeleportMasterLastDeathPoint();
+		}
 	}
 
 	@Override @Nullable
@@ -186,11 +219,26 @@ public class ServerPlayerMixin implements ITeleportable {
 		if(index < 0 || index >= MAX_HOME_COUNT.get()) {
 			throw TPMCommands.INVALID_SETHOME_INDEX_PARAMETER.create(index, MAX_HOME_COUNT.get());
 		}
-		this.homes[index] = pos;
+		this.teleportMasterHomes[index] = pos;
 	}
 
 	@Override @Nullable
 	public GlobalPos getTeleportMasterHome(int index) {
-		return this.homes[index];
+		return this.teleportMasterHomes[index];
+	}
+
+	@Override
+	public GlobalPos[] getTeleportMasterHomes() {
+		return this.teleportMasterHomes;
+	}
+
+	@Override
+	public void setTeleportMasterLastDeathPoint(@Nullable GlobalPos pos) {
+		this.lastDeathPoint = pos;
+	}
+
+	@Override @Nullable
+	public GlobalPos getTeleportMasterLastDeathPoint() {
+		return this.lastDeathPoint;
 	}
 }

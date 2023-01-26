@@ -3,6 +3,8 @@
   "language.code": "en_us",
   "language.region": "United States",
 
+  "info.tpmaster.death": "You die in %s at (%d, %d, %d).",
+
   "commands.tpmaster.accept.success": "You accepted %s's teleport request.",
   "commands.tpmaster.accept.failed.no_request": "No requester found, you have no need to accept.",
   "commands.tpmaster.deny.success": "You denied %s's teleport request.",
@@ -22,7 +24,9 @@
   "commands.tpmaster.sethome.invalid.index": "Invalid parameter index = %d, required 0 <= index < %d.",
   "commands.tpmaster.home.failed.no_home": "Failed to go home, you haven't set home %d yet.",
   "commands.tpmaster.home.failed.no_level": "Failed to go home, no dimension matches \"%s\".",
+  "commands.tpmaster.back.failed.no_home": "Failed to go back, you don't have a death point.",
+  "commands.tpmaster.back.failed.no_level": "Failed to go back, no dimension matches \"%s\".",
   "commands.tpmaster.remove.home.success": "Successfully remove your home %d.",
   "commands.tpmaster.remove.back.success": "Successfully remove your death point.",
-  "commands.tpmaster.help": "Usage: `/tpmaster <operation> [<arg1> <arg2> ...]`.\n`/tpmaster accept` - accept the teleport request you just received.\n`/tpmaster deny` - deny the teleport request you just received.\n`/tpmaster away [<distance> [<mustOnLand>]]` - randomly teleport you <distance> blocks away (disable <mustOnLand> to accept positions in water).\n`/tpmaster request <target> [ ask | invite ]` - create a teleport request that you ask <target> if you can teleport where <target> is, or you invite <target> to come to where you are.\n`/tpmaster spawn` - teleport to shared spawn point.\n`/tpmaster help` - show help information."
+  "commands.tpmaster.help": "Usage: `/tpmaster <operation> [<arg1> <arg2> ...]`.\n`/tpmaster accept` - accept the teleport request you just received.\n`/tpmaster deny` - deny the teleport request you just received.\n`/tpmaster away [<distance> [<mustOnLand>]]` - randomly teleport you <distance> blocks away (disable <mustOnLand> to accept positions in water).\n`/tpmaster request <target> [ ask | invite ]` - create a teleport request that you ask <target> if you can teleport where <target> is, or you invite <target> to come to where you are.\n`/tpmaster spawn` - teleport to shared spawn point.\n`/tpmaster sethome [<index>]` - set your current location as your home <index>.\n`/tpmaster home [<index>]` - teleport to your home <index>.\n`/tpmaster back` - teleport back to your last death point.\n`/tpmaster remove home [<index>]` - remove your home <index>.\n`/tpmaster remove back` - remove your last death point.\n`/tpmaster help` - show help information."
 }

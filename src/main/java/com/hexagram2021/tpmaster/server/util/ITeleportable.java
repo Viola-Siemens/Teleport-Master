@@ -25,6 +25,11 @@ public interface ITeleportable {
 	void setTeleportMasterHome(GlobalPos pos, int index) throws CommandSyntaxException;
 	@Nullable
 	GlobalPos getTeleportMasterHome(int index);
+	GlobalPos[] getTeleportMasterHomes();
+
+	void setTeleportMasterLastDeathPoint(@Nullable GlobalPos pos);
+	@Nullable
+	GlobalPos getTeleportMasterLastDeathPoint();
 
 	enum RequestType {
 		ASK,		//Ask if requester can teleport to where requestee is.

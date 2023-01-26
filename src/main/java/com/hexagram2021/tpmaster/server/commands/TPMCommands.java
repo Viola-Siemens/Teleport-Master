@@ -83,7 +83,10 @@ public class TPMCommands {
 										.executes(context -> home(context.getSource(), context.getSource().getEntityOrException(), IntegerArgumentType.getInteger(context, "index")))
 						)
 		).then(
-				Commands.literal("remove").requires(stack -> stack.hasPermission(TPMServerConfig.BACK_PERMISSION_LEVEL.get()))
+				Commands.literal("back").requires(stack -> stack.hasPermission(TPMServerConfig.BACK_PERMISSION_LEVEL.get()))
+						.executes(context -> back(context.getSource(), context.getSource().getEntityOrException()))
+		).then(
+				Commands.literal("remove").requires(stack -> stack.hasPermission(TPMServerConfig.REMOVE_PERMISSION_LEVEL.get()))
 						.then(
 								Commands.literal("home").then(
 										Commands.argument("index", IntegerArgumentType.integer(0, TPMServerConfig.MAX_HOME_COUNT.get() - 1))
@@ -97,7 +100,7 @@ public class TPMCommands {
 				Commands.literal("help").requires(stack -> stack.hasPermission(TPMServerConfig.HELP_PERMISSION_LEVEL.get()))
 						.executes(context -> help(context.getSource().getEntityOrException()))
 		);
-	}//TODO: remove home
+	}
 
 	private static final SimpleCommandExceptionType NO_NEED_TO_ACCEPT = new SimpleCommandExceptionType(
 			Component.translatable("commands.tpmaster.accept.failed.no_request")
@@ -118,11 +121,17 @@ public class TPMCommands {
 	public static final Dynamic2CommandExceptionType INVALID_SETHOME_INDEX_PARAMETER = new Dynamic2CommandExceptionType(
 			(i, max) -> Component.translatable("commands.tpmaster.sethome.invalid.index", i, max)
 	);
-	private static final DynamicCommandExceptionType NO_HOME_TO_BACK = new DynamicCommandExceptionType(
+	private static final DynamicCommandExceptionType NO_HOME_TO_HOME = new DynamicCommandExceptionType(
 			(d) -> Component.translatable("commands.tpmaster.home.failed.no_home", d)
 	);
-	private static final DynamicCommandExceptionType NO_LEVEL_FOUNDED = new DynamicCommandExceptionType(
+	private static final DynamicCommandExceptionType NO_LEVEL_FOUNDED_TO_HOME = new DynamicCommandExceptionType(
 			(level) -> Component.translatable("commands.tpmaster.home.failed.no_level", level)
+	);
+	private static final SimpleCommandExceptionType NO_DEATH_POINT_TO_BACK = new SimpleCommandExceptionType(
+			Component.translatable("commands.tpmaster.back.failed.no_home")
+	);
+	private static final DynamicCommandExceptionType NO_LEVEL_FOUNDED_TO_BACK = new DynamicCommandExceptionType(
+			(level) -> Component.translatable("commands.tpmaster.back.failed.no_level", level)
 	);
 
 	private static final DynamicCommandExceptionType COOL_DOWN_AWAY = new DynamicCommandExceptionType(
@@ -309,11 +318,11 @@ public class TPMCommands {
 		if(entity instanceof ITeleportable teleportable) {
 			GlobalPos globalPos = teleportable.getTeleportMasterHome(index);
 			if(globalPos == null) {
-				throw NO_HOME_TO_BACK.create(index);
+				throw NO_HOME_TO_HOME.create(index);
 			}
 			ServerLevel level = stack.getServer().getLevel(globalPos.dimension());
 			if(level == null) {
-				throw NO_LEVEL_FOUNDED.create(globalPos.dimension().toString());
+				throw NO_LEVEL_FOUNDED_TO_HOME.create(globalPos.dimension().toString());
 			}
 			BlockPos pos = globalPos.pos();
 			TeleportCommand.performTeleport(
@@ -327,9 +336,23 @@ public class TPMCommands {
 		return Command.SINGLE_SUCCESS;
 	}
 
-	private static int back(CommandSourceStack stack, Entity entity) {
+	private static int back(CommandSourceStack stack, Entity entity) throws CommandSyntaxException {
 		if(entity instanceof ITeleportable teleportable) {
-			//TODO
+			GlobalPos globalPos = teleportable.getTeleportMasterLastDeathPoint();
+			if(globalPos == null) {
+				throw NO_DEATH_POINT_TO_BACK.create();
+			}
+			ServerLevel level = stack.getServer().getLevel(globalPos.dimension());
+			if(level == null) {
+				throw NO_LEVEL_FOUNDED_TO_BACK.create(globalPos.dimension().toString());
+			}
+			BlockPos pos = globalPos.pos();
+			TeleportCommand.performTeleport(
+					stack, entity, level,
+					pos.getX(), pos.getY() + 1.0D, pos.getZ(),
+					EnumSet.noneOf(ClientboundPlayerPositionPacket.RelativeArgument.class),
+					entity.getYRot(), entity.getXRot(), null
+			);
 		}
 		return Command.SINGLE_SUCCESS;
 	}
@@ -344,7 +367,7 @@ public class TPMCommands {
 
 	private static int removeBack(Entity entity) {
 		if(entity instanceof ITeleportable teleportable) {
-			//TODO
+			teleportable.setTeleportMasterLastDeathPoint(null);
 			entity.sendSystemMessage(Component.translatable("commands.tpmaster.remove.back.success"));
 		}
 		return Command.SINGLE_SUCCESS;
