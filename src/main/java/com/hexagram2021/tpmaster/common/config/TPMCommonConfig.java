@@ -1,4 +1,4 @@
-package com.hexagram2021.tpmaster.server.config;
+package com.hexagram2021.tpmaster.common.config;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.world.level.biome.Biomes;
@@ -7,7 +7,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TPMServerConfig {
+public class TPMCommonConfig {
 	public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 	public static final ForgeConfigSpec SPEC;
 

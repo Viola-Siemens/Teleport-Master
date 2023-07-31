@@ -1,6 +1,6 @@
 package com.hexagram2021.tpmaster.server.commands;
 
-import com.hexagram2021.tpmaster.server.config.TPMServerConfig;
+import com.hexagram2021.tpmaster.common.config.TPMCommonConfig;
 import com.hexagram2021.tpmaster.server.util.ITeleportable;
 import com.hexagram2021.tpmaster.server.util.LevelUtils;
 import com.mojang.brigadier.Command;
@@ -18,7 +18,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.commands.TeleportCommand;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -26,8 +25,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
@@ -35,13 +32,13 @@ import java.util.EnumSet;
 public class TPMCommands {
 	public static LiteralArgumentBuilder<CommandSourceStack> register() {
 		return Commands.literal("tpmaster").then(
-				Commands.literal("accept").requires(stack -> stack.hasPermission(TPMServerConfig.ACCEPT_DENY_PERMISSION_LEVEL.get()))
+				Commands.literal("accept").requires(stack -> stack.hasPermission(TPMCommonConfig.ACCEPT_DENY_PERMISSION_LEVEL.get()))
 						.executes(context -> accept(context.getSource(), context.getSource().getEntityOrException()))
 		).then(
-				Commands.literal("deny").requires(stack -> stack.hasPermission(TPMServerConfig.ACCEPT_DENY_PERMISSION_LEVEL.get()))
+				Commands.literal("deny").requires(stack -> stack.hasPermission(TPMCommonConfig.ACCEPT_DENY_PERMISSION_LEVEL.get()))
 						.executes(context -> deny(context.getSource().getEntityOrException()))
 		).then(
-				Commands.literal("away").requires(stack -> stack.hasPermission(TPMServerConfig.AWAY_PERMISSION_LEVEL.get()))
+				Commands.literal("away").requires(stack -> stack.hasPermission(TPMCommonConfig.AWAY_PERMISSION_LEVEL.get()))
 						.executes(context -> away(context.getSource(), context.getSource().getEntityOrException(), 0, true, null))
 						.then(
 								Commands.argument("distance", IntegerArgumentType.integer(0, 10000))
@@ -52,7 +49,7 @@ public class TPMCommands {
 										)
 						)
 		).then(
-				Commands.literal("request").requires(stack -> stack.hasPermission(TPMServerConfig.REQUEST_PERMISSION_LEVEL.get()))
+				Commands.literal("request").requires(stack -> stack.hasPermission(TPMCommonConfig.REQUEST_PERMISSION_LEVEL.get()))
 						.then(
 								Commands.argument("target", EntityArgument.entity())
 										.executes(context -> request(context.getSource(), context.getSource().getEntityOrException(), EntityArgument.getEntity(context, "target"), ITeleportable.RequestType.ASK))
@@ -66,30 +63,30 @@ public class TPMCommands {
 										)
 						)
 		).then(
-				Commands.literal("spawn").requires(stack -> stack.hasPermission(TPMServerConfig.SPAWN_PERMISSION_LEVEL.get()))
+				Commands.literal("spawn").requires(stack -> stack.hasPermission(TPMCommonConfig.SPAWN_PERMISSION_LEVEL.get()))
 						.executes(context -> spawn(context.getSource(), context.getSource().getEntityOrException()))
 		).then(
-				Commands.literal("sethome").requires(stack -> stack.hasPermission(TPMServerConfig.HOME_PERMISSION_LEVEL.get()))
+				Commands.literal("sethome").requires(stack -> stack.hasPermission(TPMCommonConfig.HOME_PERMISSION_LEVEL.get()))
 						.executes(context -> sethome(context.getSource().getEntityOrException(), 0))
 						.then(
-								Commands.argument("index", IntegerArgumentType.integer(0, TPMServerConfig.MAX_HOME_COUNT.get() - 1))
+								Commands.argument("index", IntegerArgumentType.integer(0, TPMCommonConfig.MAX_HOME_COUNT.get() - 1))
 										.executes(context -> sethome(context.getSource().getEntityOrException(), IntegerArgumentType.getInteger(context, "index")))
 						)
 		).then(
-				Commands.literal("home").requires(stack -> stack.hasPermission(TPMServerConfig.HOME_PERMISSION_LEVEL.get()))
+				Commands.literal("home").requires(stack -> stack.hasPermission(TPMCommonConfig.HOME_PERMISSION_LEVEL.get()))
 						.executes(context -> home(context.getSource(), context.getSource().getEntityOrException(), 0))
 						.then(
-								Commands.argument("index", IntegerArgumentType.integer(0, TPMServerConfig.MAX_HOME_COUNT.get() - 1))
+								Commands.argument("index", IntegerArgumentType.integer(0, TPMCommonConfig.MAX_HOME_COUNT.get() - 1))
 										.executes(context -> home(context.getSource(), context.getSource().getEntityOrException(), IntegerArgumentType.getInteger(context, "index")))
 						)
 		).then(
-				Commands.literal("back").requires(stack -> stack.hasPermission(TPMServerConfig.BACK_PERMISSION_LEVEL.get()))
+				Commands.literal("back").requires(stack -> stack.hasPermission(TPMCommonConfig.BACK_PERMISSION_LEVEL.get()))
 						.executes(context -> back(context.getSource(), context.getSource().getEntityOrException()))
 		).then(
-				Commands.literal("remove").requires(stack -> stack.hasPermission(TPMServerConfig.REMOVE_PERMISSION_LEVEL.get()))
+				Commands.literal("remove").requires(stack -> stack.hasPermission(TPMCommonConfig.REMOVE_PERMISSION_LEVEL.get()))
 						.then(
 								Commands.literal("home").then(
-										Commands.argument("index", IntegerArgumentType.integer(0, TPMServerConfig.MAX_HOME_COUNT.get() - 1))
+										Commands.argument("index", IntegerArgumentType.integer(0, TPMCommonConfig.MAX_HOME_COUNT.get() - 1))
 												.executes(context -> removeHome(context.getSource().getEntityOrException(), IntegerArgumentType.getInteger(context, "index")))
 								)
 						)
@@ -97,7 +94,7 @@ public class TPMCommands {
 								Commands.literal("back").executes(context -> removeBack(context.getSource().getEntityOrException()))
 						)
 		).then(
-				Commands.literal("help").requires(stack -> stack.hasPermission(TPMServerConfig.HELP_PERMISSION_LEVEL.get()))
+				Commands.literal("help").requires(stack -> stack.hasPermission(TPMCommonConfig.HELP_PERMISSION_LEVEL.get()))
 						.executes(context -> help(context.getSource().getEntityOrException()))
 		);
 	}
@@ -204,17 +201,16 @@ public class TPMCommands {
 		double x = entity.getX();
 		double y = entity.getY();
 		double z = entity.getZ();
-		for(int i = 0; i < TPMServerConfig.AWAY_TRY_COUNT.get(); ++i) {
+		for(int i = 0; i < TPMCommonConfig.AWAY_TRY_COUNT.get(); ++i) {
 			double phi = random.nextDouble() * 2.0D * Math.acos(-1.0D);
-			x = entity.getX() + distance * Math.cos(phi) + random.nextDouble() * TPMServerConfig.AWAY_NOISE_BOUND.get() * distance;
-			z = entity.getZ() + distance * Math.sin(phi) + random.nextDouble() * TPMServerConfig.AWAY_NOISE_BOUND.get() * distance;
-			BlockPos blockPos = new BlockPos(x, 255.0D, z);
-			Biome biome = entity.level.getBiome(blockPos).value();
+			x = entity.getX() + distance * Math.cos(phi) + random.nextDouble() * TPMCommonConfig.AWAY_NOISE_BOUND.get() * distance;
+			z = entity.getZ() + distance * Math.sin(phi) + random.nextDouble() * TPMCommonConfig.AWAY_NOISE_BOUND.get() * distance;
+			BlockPos blockPos = new BlockPos(x, 200.0D, z);
+			String biomeId = entity.level.getBiome(blockPos).unwrapKey().orElseThrow().location().toString();
 			boolean conti = false;
 			if(mustOnLand) {
-				for (String ocean : TPMServerConfig.OCEAN_BIOME_KEYS.get()) {
-					ResourceLocation biomeId = ForgeRegistries.BIOMES.getKey(biome);
-					if (biomeId != null && biomeId.toString().equals(ocean)) {
+				for (String ocean : TPMCommonConfig.OCEAN_BIOME_KEYS.get()) {
+					if (biomeId.equals(ocean)) {
 						conti = true;
 						break;
 					}
@@ -261,7 +257,7 @@ public class TPMCommands {
 						case ASK -> "commands.tpmaster.request.receive.ask";
 						case INVITE -> "commands.tpmaster.request.receive.invite";
 					},
-					entity.getName().getString(), TPMServerConfig.REQUEST_COMMAND_AUTO_DENY_TICK.get() / 20
+					entity.getName().getString(), TPMCommonConfig.REQUEST_COMMAND_AUTO_DENY_TICK.get() / 20
 			));
 		} else {
 			entity.sendSystemMessage(Component.translatable("commands.tpmaster.request.success", target.getName().getString()));

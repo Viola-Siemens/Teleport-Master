@@ -1,8 +1,8 @@
 package com.hexagram2021.tpmaster.mixin;
 
 import com.hexagram2021.tpmaster.TeleportMaster;
+import com.hexagram2021.tpmaster.common.config.TPMCommonConfig;
 import com.hexagram2021.tpmaster.server.commands.TPMCommands;
-import com.hexagram2021.tpmaster.server.config.TPMServerConfig;
 import com.hexagram2021.tpmaster.server.util.ITeleportable;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.Util;
@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.UUID;
 
-import static com.hexagram2021.tpmaster.server.config.TPMServerConfig.*;
+import static com.hexagram2021.tpmaster.common.config.TPMCommonConfig.*;
 
 @Mixin(ServerPlayer.class)
 public class ServerPlayerMixin implements ITeleportable {
@@ -147,7 +147,7 @@ public class ServerPlayerMixin implements ITeleportable {
 			this.requestType = teleportable.getRequestType();
 			this.teleportMasterAwayCoolDownTicks = teleportable.getTeleportMasterAwayCoolDownTick();
 			this.teleportMasterRequestCoolDownTicks = teleportable.getTeleportMasterRequestCoolDownTick();
-			this.teleportMasterAutoDenyTicks = TPMServerConfig.REQUEST_COMMAND_AUTO_DENY_TICK.get();
+			this.teleportMasterAutoDenyTicks = TPMCommonConfig.REQUEST_COMMAND_AUTO_DENY_TICK.get();
 			for(int i = 0; i < MAX_HOME_COUNT.get(); ++i) {
 				this.teleportMasterHomes[i] = teleportable.getTeleportMasterHome(i);
 			}
@@ -178,7 +178,7 @@ public class ServerPlayerMixin implements ITeleportable {
 		this.teleportMasterRequester = from;
 		this.requestType = type;
 
-		this.teleportMasterAutoDenyTicks = TPMServerConfig.REQUEST_COMMAND_AUTO_DENY_TICK.get();
+		this.teleportMasterAutoDenyTicks = TPMCommonConfig.REQUEST_COMMAND_AUTO_DENY_TICK.get();
 	}
 
 	@Override
