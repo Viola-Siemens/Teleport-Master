@@ -17,12 +17,12 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import net.minecraft.server.commands.TeleportCommand;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.NeutralMob;
+import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.monster.Monster;
 
@@ -150,13 +150,13 @@ public class TPMCommands {
 				case ASK -> TeleportCommand.performTeleport(
 						stack, requester, (ServerLevel)entity.level,
 						entity.getX(), entity.getY(), entity.getZ(),
-						EnumSet.noneOf(ClientboundPlayerPositionPacket.RelativeArgument.class),
+						EnumSet.noneOf(RelativeMovement.class),
 						requester.getYRot(), requester.getXRot(), null
 				);
 				case INVITE -> TeleportCommand.performTeleport(
 						stack, entity, (ServerLevel)requester.level,
 						requester.getX(), requester.getY(), requester.getZ(),
-						EnumSet.noneOf(ClientboundPlayerPositionPacket.RelativeArgument.class),
+						EnumSet.noneOf(RelativeMovement.class),
 						entity.getYRot(), entity.getXRot(), null
 				);
 			}
@@ -205,7 +205,7 @@ public class TPMCommands {
 			double phi = random.nextDouble() * 2.0D * Math.acos(-1.0D);
 			x = entity.getX() + distance * Math.cos(phi) + random.nextDouble() * TPMCommonConfig.AWAY_NOISE_BOUND.get() * distance;
 			z = entity.getZ() + distance * Math.sin(phi) + random.nextDouble() * TPMCommonConfig.AWAY_NOISE_BOUND.get() * distance;
-			BlockPos blockPos = new BlockPos(x, 200.0D, z);
+			BlockPos blockPos = new BlockPos((int)x, 200, (int)z);
 			String biomeId = entity.level.getBiome(blockPos).unwrapKey().orElseThrow().location().toString();
 			boolean conti = false;
 			if(mustOnLand) {
@@ -228,7 +228,7 @@ public class TPMCommands {
 		if(!flag) {
 			throw CANNOT_FIND_POSITION.create();
 		}
-		TeleportCommand.performTeleport(stack, entity, (ServerLevel)entity.level, x, y, z, EnumSet.noneOf(ClientboundPlayerPositionPacket.RelativeArgument.class), entity.getYRot(), entity.getXRot(), lookAt);
+		TeleportCommand.performTeleport(stack, entity, (ServerLevel)entity.level, x, y, z, EnumSet.noneOf(RelativeMovement.class), entity.getYRot(), entity.getXRot(), lookAt);
 
 		entity.sendSystemMessage(Component.translatable("commands.tpmaster.away.success", distance));
 
@@ -268,13 +268,13 @@ public class TPMCommands {
 					case ASK -> TeleportCommand.performTeleport(
 							stack, entity, (ServerLevel)target.level,
 							target.getX(), target.getY(), target.getZ(),
-							EnumSet.noneOf(ClientboundPlayerPositionPacket.RelativeArgument.class),
+							EnumSet.noneOf(RelativeMovement.class),
 							entity.getYRot(), entity.getXRot(), null
 					);
 					case INVITE -> TeleportCommand.performTeleport(
 							stack, target, (ServerLevel)entity.level,
 							entity.getX(), entity.getY(), entity.getZ(),
-							EnumSet.noneOf(ClientboundPlayerPositionPacket.RelativeArgument.class),
+							EnumSet.noneOf(RelativeMovement.class),
 							target.getYRot(), target.getXRot(), null
 					);
 				}
@@ -293,7 +293,7 @@ public class TPMCommands {
 		TeleportCommand.performTeleport(
 				stack, entity, overworld,
 				spawnPoint.getX(), spawnPoint.getY() + 1.0D, spawnPoint.getZ(),
-				EnumSet.noneOf(ClientboundPlayerPositionPacket.RelativeArgument.class),
+				EnumSet.noneOf(RelativeMovement.class),
 				entity.getYRot(), entity.getXRot(), null
 		);
 
@@ -324,7 +324,7 @@ public class TPMCommands {
 			TeleportCommand.performTeleport(
 					stack, entity, level,
 					pos.getX(), pos.getY() + 1.0D, pos.getZ(),
-					EnumSet.noneOf(ClientboundPlayerPositionPacket.RelativeArgument.class),
+					EnumSet.noneOf(RelativeMovement.class),
 					entity.getYRot(), entity.getXRot(), null
 			);
 		}
@@ -346,7 +346,7 @@ public class TPMCommands {
 			TeleportCommand.performTeleport(
 					stack, entity, level,
 					pos.getX(), pos.getY() + 1.0D, pos.getZ(),
-					EnumSet.noneOf(ClientboundPlayerPositionPacket.RelativeArgument.class),
+					EnumSet.noneOf(RelativeMovement.class),
 					entity.getYRot(), entity.getXRot(), null
 			);
 		}
