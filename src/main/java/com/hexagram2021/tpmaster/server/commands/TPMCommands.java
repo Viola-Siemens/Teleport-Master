@@ -148,13 +148,13 @@ public class TPMCommands {
 
 			switch(requestType) {
 				case ASK -> TeleportCommand.performTeleport(
-						stack, requester, (ServerLevel)entity.level,
+						stack, requester, (ServerLevel)entity.level(),
 						entity.getX(), entity.getY(), entity.getZ(),
 						EnumSet.noneOf(RelativeMovement.class),
 						requester.getYRot(), requester.getXRot(), null
 				);
 				case INVITE -> TeleportCommand.performTeleport(
-						stack, entity, (ServerLevel)requester.level,
+						stack, entity, (ServerLevel)requester.level(),
 						requester.getX(), requester.getY(), requester.getZ(),
 						EnumSet.noneOf(RelativeMovement.class),
 						entity.getYRot(), entity.getXRot(), null
@@ -191,13 +191,13 @@ public class TPMCommands {
 			teleportable.setTeleportMasterAway();
 		}
 		if(distance == 0) {
-			distance = entity.level.getRandom().nextInt(600) + 600;
+			distance = entity.level().getRandom().nextInt(600) + 600;
 		} else if(distance < 0 || distance > 10000) {
 			throw INVALID_AWAY_DISTANCE_PARAMETER.create(distance);
 		}
 
 		boolean flag = false;
-		RandomSource random = entity.level.getRandom();
+		RandomSource random = entity.level().getRandom();
 		double x = entity.getX();
 		double y = entity.getY();
 		double z = entity.getZ();
@@ -206,7 +206,7 @@ public class TPMCommands {
 			x = entity.getX() + distance * Math.cos(phi) + random.nextDouble() * TPMCommonConfig.AWAY_NOISE_BOUND.get() * distance;
 			z = entity.getZ() + distance * Math.sin(phi) + random.nextDouble() * TPMCommonConfig.AWAY_NOISE_BOUND.get() * distance;
 			BlockPos blockPos = new BlockPos((int)x, 200, (int)z);
-			String biomeId = entity.level.getBiome(blockPos).unwrapKey().orElseThrow().location().toString();
+			String biomeId = entity.level().getBiome(blockPos).unwrapKey().orElseThrow().location().toString();
 			boolean conti = false;
 			if(mustOnLand) {
 				for (String ocean : TPMCommonConfig.OCEAN_BIOME_KEYS.get()) {
@@ -218,7 +218,7 @@ public class TPMCommands {
 			}
 			if(!conti) {
 				flag = true;
-				y = LevelUtils.getTopBlock(entity.level, blockPos);
+				y = LevelUtils.getTopBlock(entity.level(), blockPos);
 				if(y < 8) {
 					continue;
 				}
@@ -228,7 +228,7 @@ public class TPMCommands {
 		if(!flag) {
 			throw CANNOT_FIND_POSITION.create();
 		}
-		TeleportCommand.performTeleport(stack, entity, (ServerLevel)entity.level, x, y, z, EnumSet.noneOf(RelativeMovement.class), entity.getYRot(), entity.getXRot(), lookAt);
+		TeleportCommand.performTeleport(stack, entity, (ServerLevel)entity.level(), x, y, z, EnumSet.noneOf(RelativeMovement.class), entity.getYRot(), entity.getXRot(), lookAt);
 
 		entity.sendSystemMessage(Component.translatable("commands.tpmaster.away.success", distance));
 
@@ -266,13 +266,13 @@ public class TPMCommands {
 			if(flag1 == flag2) {
 				switch(type) {
 					case ASK -> TeleportCommand.performTeleport(
-							stack, entity, (ServerLevel)target.level,
+							stack, entity, (ServerLevel)target.level(),
 							target.getX(), target.getY(), target.getZ(),
 							EnumSet.noneOf(RelativeMovement.class),
 							entity.getYRot(), entity.getXRot(), null
 					);
 					case INVITE -> TeleportCommand.performTeleport(
-							stack, target, (ServerLevel)entity.level,
+							stack, target, (ServerLevel)entity.level(),
 							entity.getX(), entity.getY(), entity.getZ(),
 							EnumSet.noneOf(RelativeMovement.class),
 							target.getYRot(), target.getXRot(), null
@@ -303,7 +303,7 @@ public class TPMCommands {
 	private static int sethome(Entity entity, int index) throws  CommandSyntaxException {
 		if(entity instanceof ITeleportable teleportable) {
 			BlockPos pos = entity.getOnPos();
-			GlobalPos globalPos = GlobalPos.of(entity.level.dimension(), entity.getOnPos());
+			GlobalPos globalPos = GlobalPos.of(entity.level().dimension(), entity.getOnPos());
 			teleportable.setTeleportMasterHome(globalPos, index);
 			entity.sendSystemMessage(Component.translatable("commands.tpmaster.sethome.success", pos.getX(), pos.getY(), pos.getZ(), index));
 		}

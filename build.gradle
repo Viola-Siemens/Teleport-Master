@@ -6,8 +6,8 @@ buildscript {
         maven { name="sponge"; url 'https://repo.spongepowered.org/repository/maven-public/' }
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath 'org.spongepowered:mixingradle:0.7.32'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '[6.0,6.2)', changing: true
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
 
@@ -19,8 +19,11 @@ apply plugin: 'net.minecraftforge.gradle'
 
 apply plugin: 'org.spongepowered.mixin'
 
+base {
+    archivesName = 'tpmaster'
+}
 
-version = '2.4.0'
+version = '3.0.0'
 group = 'com.hexagram2021.tpmaster'
 archivesBaseName = 'tpmaster'
 
@@ -28,9 +31,13 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
-    mappings channel: 'official', version: '1.19.4'
+    mappings channel: 'official', version: '1.20'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    enableIdeaPrepareRuns = true
+    copyIdeResources = true
+    generateRunFolders = true
 
     runs {
         client {
@@ -128,7 +135,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.4-45.1.0'
+    minecraft 'net.minecraftforge:forge:1.20-46.0.14'
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
@@ -149,10 +156,20 @@ jar {
 
 jar.finalizedBy('reobfJar')
 
+task sourceJar(type: Jar) {
+    archiveClassifier.set('sources')
+    from sourceSets.main.allJava
+}
+
+artifacts {
+    archives sourceJar
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
             artifact jar
+            artifact sourceJar
         }
     }
     repositories {

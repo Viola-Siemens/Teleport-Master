@@ -70,7 +70,7 @@ public class ServerPlayerMixin implements ITeleportable {
 			if (uuid.equals(Util.NIL_UUID)) {
 				this.teleportMasterRequester = null;
 			} else {
-				this.teleportMasterRequester = ((ServerPlayer) (Object) this).level.getPlayerByUUID(uuid);
+				this.teleportMasterRequester = ((ServerPlayer) (Object) this).level().getPlayerByUUID(uuid);
 			}
 		}
 		if(nbt.contains("RequestType", Tag.TAG_BYTE)) {
@@ -136,8 +136,8 @@ public class ServerPlayerMixin implements ITeleportable {
 	public void recordDeathPoint(DamageSource damageSource, CallbackInfo ci) {
 		ServerPlayer current = (ServerPlayer)(Object)this;
 		BlockPos pos = current.blockPosition();
-		this.setTeleportMasterLastDeathPoint(GlobalPos.of(current.level.dimension(), pos));
-		current.sendSystemMessage(Component.translatable("info.tpmaster.death", current.level.dimension().location(), pos.getX(), pos.getY(), pos.getZ()));
+		this.setTeleportMasterLastDeathPoint(GlobalPos.of(current.level().dimension(), pos));
+		current.sendSystemMessage(Component.translatable("info.tpmaster.death", current.level().dimension().location(), pos.getX(), pos.getY(), pos.getZ()));
 	}
 
 	@Inject(method = "restoreFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setLastDeathLocation(Ljava/util/Optional;)V", shift = At.Shift.AFTER))
